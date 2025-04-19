@@ -1,22 +1,37 @@
 // src/pages/index.js
-import { useState } from 'react';
-import PartitionView from '../components/PartitionView';
-import TestCaseList from '../components/TestCaseList';
+import { useState, useEffect } from 'react';
+import PartitionView      from '../components/PartitionView';
+import TestCaseList       from '../components/TestCaseList';
+import XMLPreviewModal    from '../components/XMLPreviewModal';
+import LoginModal         from '../components/LoginModal';
+import RegisterModal      from '../components/RegisterModal';
+import { generateTestRun } from '../api/generate';
+import { login, register } from '../api/auth';
 
 export default function Home() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [data, setData]                   = useState(null);
+  const [loading, setLoading]             = useState(false);
+  const [isLoggedIn, setIsLoggedIn]       = useState(false);
 
-  // Previews
-  const [dataDictPreview, setDataDictPreview] = useState('');
+  const [dataDictPreview, setDataDictPreview]         = useState('');
   const [decisionTreePreview, setDecisionTreePreview] = useState('');
 
-  // Modal state
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
-  const [modalContent, setModalContent] = useState('');
+  // XML modal
+  const [xmlModal, setXmlModal] = useState({
+    open: false,
+    title: '',
+    content: ''
+  });
 
-  // Read file as text
+  // Auth modals
+  const [loginOpen, setLoginOpen]       = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
+
+  // Check token on mount
+  useEffect(() => {
+    if (localStorage.getItem('token')) setIsLoggedIn(true);
+  }, []);
+
   const handleFilePreview = (file, setter) => {
     if (!file) return setter('');
     const reader = new FileReader();
@@ -24,23 +39,38 @@ export default function Home() {
     reader.readAsText(file);
   };
 
-  const openModal = (title, content) => {
-    setModalTitle(title);
-    setModalContent(content);
-    setModalOpen(true);
+  const openXmlModal = (title, content) => {
+    setXmlModal({ open: true, title, content });
   };
-  const closeModal = () => setModalOpen(false);
+  const closeXmlModal = () => setXmlModal(m => ({ ...m, open: false }));
+
+  const handleLogin = async (username, password) => {
+    const { success, token, error } = await login(username, password);
+    if (success) {
+      localStorage.setItem('token', token);
+      setIsLoggedIn(true);
+      setLoginOpen(false);
+    } else alert(error);
+  };
+
+  const handleRegister = async (username, password) => {
+    const { success, error } = await register(username, password);
+    if (success) {
+      alert('Registered! Please log in.');
+      setRegisterOpen(false);
+    } else alert(error);
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
+    if (!isLoggedIn) {
+      setLoginOpen(true);
+      return;
+    }
     setLoading(true);
     const fd = new FormData(e.target);
     try {
-      const res = await fetch('http://localhost:5000/api/generate', {
-        method: 'POST',
-        body: fd
-      });
-      const json = await res.json();
+      const json = await generateTestRun(fd);
       if (json.success) setData(json);
       else alert(json.error);
     } catch (err) {
@@ -51,27 +81,45 @@ export default function Home() {
   };
 
   return (
-    <main className="container mx-auto p-6 space-y-10">
-      <h1 className="text-3xl font-bold text-center">TestGen Web</h1>
+    <main className="container mx-auto p-6 space-y-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">TestGen Web</h1>
+        {isLoggedIn
+          ? <button
+              onClick={() => {
+                localStorage.removeItem('token');
+                setIsLoggedIn(false);
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >Logout</button>
+          : <div className="space-x-4">
+              <button
+                onClick={() => setLoginOpen(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >Login</button>
+              <button
+                onClick={() => setRegisterOpen(true)}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >Register</button>
+            </div>
+        }
+      </div>
 
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow rounded-lg p-6"
       >
+        {/* Data Dictionary */}
         <div>
-          <label className="block mb-1 font-medium">Data Dictionary (XML)</label>
+          <label className="block mb-1 font-medium">
+            Data Dictionary (XML)
+          </label>
           <input
             type="file"
             name="dataDictionary"
             accept=".xml"
             required
-            className="
-              block w-full
-              border-2 border-dashed border-gray-300
-              rounded-lg p-6 text-center text-gray-600
-              hover:border-blue-400 focus:outline-none focus:border-blue-500
-              cursor-pointer
-            "
+            className="block w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-600 hover:border-blue-400 focus:outline-none focus:border-blue-500 cursor-pointer"
             onChange={e =>
               handleFilePreview(e.target.files[0], setDataDictPreview)
             }
@@ -79,27 +127,26 @@ export default function Home() {
           <button
             type="button"
             disabled={!dataDictPreview}
-            onClick={() => openModal('Data Dictionary Preview', dataDictPreview)}
+            onClick={() =>
+              openXmlModal('Data Dictionary Preview', dataDictPreview)
+            }
             className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300"
           >
             Preview XML
           </button>
         </div>
 
+        {/* Decision Tree */}
         <div>
-          <label className="block mb-1 font-medium">Decision Tree (XML)</label>
+          <label className="block mb-1 font-medium">
+            Decision Tree (XML)
+          </label>
           <input
             type="file"
             name="decisionTree"
             accept=".xml"
             required
-            className="
-              block w-full
-              border-2 border-dashed border-gray-300
-              rounded-lg p-6 text-center text-gray-600
-              hover:border-blue-400 focus:outline-none focus:border-blue-500
-              cursor-pointer
-            "
+            className="block w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-600 hover:border-blue-400 focus:outline-none focus:border-blue-500 cursor-pointer"
             onChange={e =>
               handleFilePreview(e.target.files[0], setDecisionTreePreview)
             }
@@ -108,7 +155,7 @@ export default function Home() {
             type="button"
             disabled={!decisionTreePreview}
             onClick={() =>
-              openModal('Decision Tree Preview', decisionTreePreview)
+              openXmlModal('Decision Tree Preview', decisionTreePreview)
             }
             className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300"
           >
@@ -116,27 +163,29 @@ export default function Home() {
           </button>
         </div>
 
+        {/* Submit */}
         <div className="md:col-span-2 text-center">
           <button
             type="submit"
             disabled={loading}
-            className="w-full md:w-auto px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition"
+            className="w-full md:w-auto px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700"
           >
-            {loading ? 'Generating…' : 'Generate'}
+            {loading ? 'Generating…' : 'Generate & Save'}
           </button>
         </div>
       </form>
 
+      {/* Results */}
       {data && (
         <>
           <PartitionView partitions={data.partitions} />
           <TestCaseList testCases={data.testCases} />
           <div className="text-center">
             <a
-              href={data.csvFile}
+              href={data.csvUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-4 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+              className="inline-block mt-4 px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700"
             >
               Download CSV
             </a>
@@ -144,33 +193,23 @@ export default function Home() {
         </>
       )}
 
-      {/* Modal Overlay */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-1/2 max-h-[90vh] overflow-auto">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-semibold">{modalTitle}</h3>
-              <button
-                onClick={closeModal}
-                className="text-gray-600 hover:text-gray-800 text-xl leading-none"
-              >
-                &times;
-              </button>
-            </div>
-            <div className="p-4 whitespace-pre-wrap text-xs">
-              {modalContent}
-            </div>
-            <div className="flex justify-end p-4 border-t">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modals */}
+      <XMLPreviewModal
+        isOpen={xmlModal.open}
+        title={xmlModal.title}
+        content={xmlModal.content}
+        onClose={closeXmlModal}
+      />
+      <LoginModal
+        isOpen={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onLogin={handleLogin}
+      />
+      <RegisterModal
+        isOpen={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        onRegister={handleRegister}
+      />
     </main>
   );
 }
