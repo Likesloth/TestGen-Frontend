@@ -9,14 +9,19 @@ import { generateTestRun } from '../api/generate';
 import { login, register } from '../api/auth';
 
 export default function Home() {
+  // Data & form state
   const [data, setData]                   = useState(null);
   const [loading, setLoading]             = useState(false);
-  const [isLoggedIn, setIsLoggedIn]       = useState(false);
 
+  // Auth & user state
+  const [isLoggedIn, setIsLoggedIn]       = useState(false);
+  const [currentUser, setCurrentUser]     = useState('');
+
+  // File previews
   const [dataDictPreview, setDataDictPreview]         = useState('');
   const [decisionTreePreview, setDecisionTreePreview] = useState('');
 
-  // XML modal
+  // XML preview modal
   const [xmlModal, setXmlModal] = useState({
     open: false,
     title: '',
@@ -27,11 +32,17 @@ export default function Home() {
   const [loginOpen, setLoginOpen]       = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
 
-  // Check token on mount
+  // On mount, restore auth state
   useEffect(() => {
-    if (localStorage.getItem('token')) setIsLoggedIn(true);
+    const token    = localStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    if (token && username) {
+      setIsLoggedIn(true);
+      setCurrentUser(username);
+    }
   }, []);
 
+  // FileReader for previews
   const handleFilePreview = (file, setter) => {
     if (!file) return setter('');
     const reader = new FileReader();
@@ -39,28 +50,38 @@ export default function Home() {
     reader.readAsText(file);
   };
 
+  // XML preview handlers
   const openXmlModal = (title, content) => {
     setXmlModal({ open: true, title, content });
   };
   const closeXmlModal = () => setXmlModal(m => ({ ...m, open: false }));
 
+  // Login handler
   const handleLogin = async (username, password) => {
     const { success, token, error } = await login(username, password);
     if (success) {
       localStorage.setItem('token', token);
+      localStorage.setItem('username', username);
       setIsLoggedIn(true);
+      setCurrentUser(username);
       setLoginOpen(false);
-    } else alert(error);
+    } else {
+      alert(error);
+    }
   };
 
+  // Register handler
   const handleRegister = async (username, password) => {
     const { success, error } = await register(username, password);
     if (success) {
-      alert('Registered! Please log in.');
+      alert('Registration successful! Please log in.');
       setRegisterOpen(false);
-    } else alert(error);
+    } else {
+      alert(error);
+    }
   };
 
+  // Generate & save test run
   const handleSubmit = async e => {
     e.preventDefault();
     if (!isLoggedIn) {
@@ -71,8 +92,11 @@ export default function Home() {
     const fd = new FormData(e.target);
     try {
       const json = await generateTestRun(fd);
-      if (json.success) setData(json);
-      else alert(json.error);
+      if (json.success) {
+        setData(json);
+      } else {
+        alert(json.error || 'Generation failed');
+      }
     } catch (err) {
       alert(err.message);
     } finally {
@@ -80,40 +104,55 @@ export default function Home() {
     }
   };
 
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    setIsLoggedIn(false);
+    setCurrentUser('');
+  };
+
   return (
     <main className="container mx-auto p-6 space-y-8">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">TestGen Web</h1>
-        {isLoggedIn
-          ? <button
-              onClick={() => {
-                localStorage.removeItem('token');
-                setIsLoggedIn(false);
-              }}
+        {isLoggedIn ? (
+          <div className="flex items-center space-x-4">
+            <span className="text-gray-700">Hello, {currentUser}</span>
+            <button
+              onClick={handleLogout}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >Logout</button>
-          : <div className="space-x-4">
-              <button
-                onClick={() => setLoginOpen(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >Login</button>
-              <button
-                onClick={() => setRegisterOpen(true)}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >Register</button>
-            </div>
-        }
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="space-x-4">
+            <button
+              onClick={() => setLoginOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => setRegisterOpen(true)}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Register
+            </button>
+          </div>
+        )}
       </div>
 
+      {/* Upload & Generate Form */}
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow rounded-lg p-6"
       >
         {/* Data Dictionary */}
         <div>
-          <label className="block mb-1 font-medium">
-            Data Dictionary (XML)
-          </label>
+          <label className="block mb-1 font-medium">Data Dictionary (XML)</label>
           <input
             type="file"
             name="dataDictionary"
@@ -138,9 +177,7 @@ export default function Home() {
 
         {/* Decision Tree */}
         <div>
-          <label className="block mb-1 font-medium">
-            Decision Tree (XML)
-          </label>
+          <label className="block mb-1 font-medium">Decision Tree (XML)</label>
           <input
             type="file"
             name="decisionTree"
@@ -163,7 +200,7 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Submit */}
+        {/* Generate Button */}
         <div className="md:col-span-2 text-center">
           <button
             type="submit"
