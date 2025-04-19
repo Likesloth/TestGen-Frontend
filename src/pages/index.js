@@ -1,21 +1,22 @@
 // src/pages/index.js
 import { useState, useEffect } from 'react';
-import PartitionView      from '../components/PartitionView';
-import TestCaseList       from '../components/TestCaseList';
-import XMLPreviewModal    from '../components/XMLPreviewModal';
-import LoginModal         from '../components/LoginModal';
-import RegisterModal      from '../components/RegisterModal';
-import { generateTestRun } from '../api/generate';
-import { login, register } from '../api/auth';
+import Link                 from 'next/link';
+import PartitionView        from '../components/PartitionView';
+import TestCaseList         from '../components/TestCaseList';
+import XMLPreviewModal      from '../components/XMLPreviewModal';
+import LoginModal           from '../components/LoginModal';
+import RegisterModal        from '../components/RegisterModal';
+import { generateTestRun }  from '../api/generate';
+import { login, register }  from '../api/auth';
 
 export default function Home() {
   // Data & form state
-  const [data, setData]                   = useState(null);
-  const [loading, setLoading]             = useState(false);
+  const [data, setData]               = useState(null);
+  const [loading, setLoading]         = useState(false);
 
   // Auth & user state
-  const [isLoggedIn, setIsLoggedIn]       = useState(false);
-  const [currentUser, setCurrentUser]     = useState('');
+  const [isLoggedIn, setIsLoggedIn]   = useState(false);
+  const [currentUser, setCurrentUser] = useState('');
 
   // File previews
   const [dataDictPreview, setDataDictPreview]         = useState('');
@@ -120,6 +121,12 @@ export default function Home() {
         {isLoggedIn ? (
           <div className="flex items-center space-x-4">
             <span className="text-gray-700">Hello, {currentUser}</span>
+            <Link
+              href="/history"
+              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >
+              History
+            </Link>
             <button
               onClick={handleLogout}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
@@ -152,7 +159,9 @@ export default function Home() {
       >
         {/* Data Dictionary */}
         <div>
-          <label className="block mb-1 font-medium">Data Dictionary (XML)</label>
+          <label className="block mb-1 font-medium">
+            Data Dictionary (XML)
+          </label>
           <input
             type="file"
             name="dataDictionary"
@@ -177,7 +186,9 @@ export default function Home() {
 
         {/* Decision Tree */}
         <div>
-          <label className="block mb-1 font-medium">Decision Tree (XML)</label>
+          <label className="block mb-1 font-medium">
+            Decision Tree (XML)
+          </label>
           <input
             type="file"
             name="decisionTree"
