@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import Navbar               from '../components/Navbar';
-import PartitionView        from '../components/PartitionView';
-import TestCaseList         from '../components/TestCaseList';
-import XMLPreviewModal      from '../components/XMLPreviewModal';
-import LoginModal           from '../components/LoginModal';
-import RegisterModal        from '../components/RegisterModal';
-import { generateTestRun }  from '../api/generate';
-import { login, register }  from '../api/auth';
+import Navbar from '../components/Navbar';
+import PartitionView from '../components/PartitionView';
+import TestCaseList from '../components/TestCaseList';
+import XMLPreviewModal from '../components/XMLPreviewModal';
+import LoginModal from '../components/LoginModal';
+import RegisterModal from '../components/RegisterModal';
+import { generateTestRun } from '../api/generate';
+import { login, register } from '../api/auth';
 
 export default function Home() {
-  const [data, setData]               = useState(null);
-  const [loading, setLoading]         = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const [isLoggedIn, setIsLoggedIn]   = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState('');
 
-  const [dataDictPreview, setDataDictPreview]         = useState('');
+  const [dataDictPreview, setDataDictPreview] = useState('');
   const [decisionTreePreview, setDecisionTreePreview] = useState('');
 
   const [xmlModal, setXmlModal] = useState({
@@ -23,11 +23,11 @@ export default function Home() {
     title: '',
     content: ''
   });
-  const [loginOpen, setLoginOpen]       = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
 
   useEffect(() => {
-    const token    = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
     if (token && username) {
       setIsLoggedIn(true);
@@ -89,7 +89,11 @@ export default function Home() {
     try {
       const json = await generateTestRun(fd);
       if (json.success) {
-        setData(json);
+        setData({
+          partitions: json.partitions,
+          testCases: json.testCases,
+          csvUrl: json.csvUrl
+        });
       } else {
         alert(json.error || 'Generation failed');
       }

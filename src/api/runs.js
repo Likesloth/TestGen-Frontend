@@ -1,21 +1,27 @@
 // src/api/runs.js
 const API = process.env.NEXT_PUBLIC_API_URL;
 
-function authHeader() {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+
+export async function generateTestRun(formData) {
+  const token = localStorage.getItem('token')
+  const res = await fetch(`${BASE}/api/runs`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData
+  })
+  return res.json()
 }
 
-export async function listRuns() {
-  const res = await fetch(`${API}/api/runs`, {
-    headers: authHeader()
-  });
-  return res.json();
+export async function listTestRuns() {
+  const token = localStorage.getItem('token')
+  const res = await fetch(`${BASE}/api/runs`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  const { success, runs, error } = await res.json()
+  return success ? runs : Promise.reject(error)
 }
 
-export async function getRun(id) {
-  const res = await fetch(`${API}/api/runs/${id}`, {
-    headers: authHeader()
-  });
-  return res.json();
+export async function downloadCsv(runId) {
+  // returns a URL you can navigate to
+  return `${BASE}/api/runs/${runId}/csv`
 }
