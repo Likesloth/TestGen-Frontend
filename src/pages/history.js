@@ -1,3 +1,4 @@
+// src/pages/history.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
@@ -15,18 +16,23 @@ export default function HistoryPage() {
   useEffect(() => {
     const token    = localStorage.getItem('token');
     const username = localStorage.getItem('username');
+
     if (token && username) {
       setIsLoggedIn(true);
       setCurrentUser(username);
-    }
 
-    async function fetchRuns() {
-      const data = await listRuns();
-      setRuns(data);
+      listRuns()
+        .then(data => setRuns(data))
+        .catch(err => {
+          console.error(err);
+          alert(err.message || 'Could not load history');
+        })
+        .finally(() => setLoading(false));
+    } else {
       setLoading(false);
+      router.push('/'); // not logged in → back to main
     }
-    fetchRuns();
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
