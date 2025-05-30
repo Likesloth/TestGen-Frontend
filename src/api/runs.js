@@ -1,5 +1,5 @@
 // src/api/runs.js
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+export const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 export async function generateTestRun(formData) {
   const token = localStorage.getItem('token')
@@ -32,6 +32,16 @@ export async function getRun(runId) {
   throw new Error(json.error || 'Failed to fetch run')
 }
 
-export function downloadCsv(runId) {
+//Dowload ECP csv only
+export function downloadEcpCsv(runId) {
+  return `${BASE}/api/runs/${runId}/ecp-csv`
+}
+
+//Dowload Syntax csv only
+export function downloadSyntaxCsv(runId) {
+  return `${BASE}/api/runs/${runId}/syntax-csv`
+}
+
+export function downloadCombinedExcel(runId) {
   return `${BASE}/api/runs/${runId}/csv`
 }

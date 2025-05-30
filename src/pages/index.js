@@ -1,22 +1,22 @@
 // src/pages/index.js
 import React, { useState, useEffect, useRef } from 'react';
-import Navbar            from '../components/Navbar';
-import PartitionView     from '../components/PartitionView';
-import TestCaseList      from '../components/TestCaseList';
-import SyntaxTestList    from '../components/SyntaxTestList';
-import XMLPreviewModal   from '../components/XMLPreviewModal';
-import LoginModal        from '../components/LoginModal';
-import RegisterModal     from '../components/RegisterModal';
+import Navbar from '../components/Navbar';
+import PartitionView from '../components/PartitionView';
+import TestCaseList from '../components/TestCaseList';
+import SyntaxTestList from '../components/SyntaxTestList';
+import XMLPreviewModal from '../components/XMLPreviewModal';
+import LoginModal from '../components/LoginModal';
+import RegisterModal from '../components/RegisterModal';
 import { generateTestRun } from '../api/generate';
 import { login, register } from '../api/auth';
-
+import { BASE } from '../api/runs'
 export default function Home() {
   // Auth & user state
-  const [isLoggedIn, setIsLoggedIn]   = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState('');
 
   // Generation result + loading
-  const [data, setData]     = useState(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // XML-preview modal
@@ -27,16 +27,16 @@ export default function Home() {
   });
 
   // Auth modals
-  const [loginOpen, setLoginOpen]       = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
 
   // Refs for file inputs
-  const dataDictRef     = useRef(null);
+  const dataDictRef = useRef(null);
   const decisionTreeRef = useRef(null);
 
   // Restore auth from localStorage
   useEffect(() => {
-    const token    = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
     if (token && username) {
       setIsLoggedIn(true);
@@ -105,11 +105,19 @@ export default function Home() {
     try {
       const json = await generateTestRun(fd);
       if (json.success) {
+        // compute per-technique URLs from the combined one
+        const runId = json.runId
+        const combinedUrl = json.csvUrl || `${BASE}/api/runs/${runId}/csv`
+        const ecpUrl = `${BASE}/api/runs/${runId}/ecp-csv`
+        const syntaxUrl = `${BASE}/api/runs/${runId}/syntax-csv`
+
         setData({
-          partitions:    json.partitions,
-          testCases:     json.testCases,
+          partitions: json.partitions,
+          testCases: json.testCases,
           syntaxResults: json.syntaxResults,
-          csvUrl:        json.csvUrl
+          csvUrl: combinedUrl,
+          ecpCsvUrl: ecpUrl,
+          syntaxCsvUrl: syntaxUrl
         });
       } else {
         alert(json.error || 'Generation failed');
@@ -197,14 +205,36 @@ export default function Home() {
             <PartitionView partitions={data.partitions} />
             <TestCaseList testCases={data.testCases} />
             <SyntaxTestList syntaxResults={data.syntaxResults} />
-            <div className="text-center">
+
+            {/* Separate downloads for each technique */}
+            <div className="mt-4 flex justify-center space-x-4">
+              <a
+                href={data.ecpCsvUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Download ECP CSV
+              </a>
+              <a
+                href={data.syntaxCsvUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+              >
+                Download Syntax CSV
+              </a>
+            </div>
+
+            {/* Combined CSV download */}
+            <div className="text-center mt-6">
               <a
                 href={data.csvUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block mt-4 px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                className="inline-block px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700"
               >
-                Download CSV
+                Download Combined CSV
               </a>
             </div>
           </>
