@@ -1,46 +1,48 @@
-import { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
-import PartitionView from '../components/PartitionView';
-import TestCaseList from '../components/TestCaseList';
-import XMLPreviewModal from '../components/XMLPreviewModal';
-import LoginModal from '../components/LoginModal';
-import RegisterModal from '../components/RegisterModal';
+// src/pages/index.js
+import React, { useState, useEffect, useRef } from 'react';
+import Navbar            from '../components/Navbar';
+import PartitionView     from '../components/PartitionView';
+import TestCaseList      from '../components/TestCaseList';
+import SyntaxTestList    from '../components/SyntaxTestList';
+import XMLPreviewModal   from '../components/XMLPreviewModal';
+import LoginModal        from '../components/LoginModal';
+import RegisterModal     from '../components/RegisterModal';
 import { generateTestRun } from '../api/generate';
 import { login, register } from '../api/auth';
 
 export default function Home() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Auth & user state
+  const [isLoggedIn, setIsLoggedIn]   = useState(false);
   const [currentUser, setCurrentUser] = useState('');
 
-  const [dataDictPreview, setDataDictPreview] = useState('');
-  const [decisionTreePreview, setDecisionTreePreview] = useState('');
+  // Generation result + loading
+  const [data, setData]     = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  // XML-preview modal
   const [xmlModal, setXmlModal] = useState({
     open: false,
     title: '',
     content: ''
   });
-  const [loginOpen, setLoginOpen] = useState(false);
+
+  // Auth modals
+  const [loginOpen, setLoginOpen]       = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
 
+  // Refs for file inputs
+  const dataDictRef     = useRef(null);
+  const decisionTreeRef = useRef(null);
+
+  // Restore auth from localStorage
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token    = localStorage.getItem('token');
     const username = localStorage.getItem('username');
     if (token && username) {
       setIsLoggedIn(true);
       setCurrentUser(username);
     }
   }, []);
-
-  const handleFilePreview = (file, setter) => {
-    if (!file) return setter('');
-    const reader = new FileReader();
-    reader.onload = e => setter(e.target.result);
-    reader.readAsText(file);
-  };
 
   const openXmlModal = (title, content) => {
     setXmlModal({ open: true, title, content });
@@ -78,6 +80,20 @@ export default function Home() {
     setCurrentUser('');
   };
 
+  // Preview handlers — read file text on demand
+  const handleDictPreview = async () => {
+    const file = dataDictRef.current?.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    openXmlModal('Data Dictionary Preview', text);
+  };
+  const handleTreePreview = async () => {
+    const file = decisionTreeRef.current?.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    openXmlModal('Decision Tree Preview', text);
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
     if (!isLoggedIn) {
@@ -90,9 +106,10 @@ export default function Home() {
       const json = await generateTestRun(fd);
       if (json.success) {
         setData({
-          partitions: json.partitions,
-          testCases: json.testCases,
-          csvUrl: json.csvUrl
+          partitions:    json.partitions,
+          testCases:     json.testCases,
+          syntaxResults: json.syntaxResults,
+          csvUrl:        json.csvUrl
         });
       } else {
         alert(json.error || 'Generation failed');
@@ -119,61 +136,51 @@ export default function Home() {
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow rounded-lg p-6"
         >
+          {/* Data Dictionary */}
           <div>
             <label className="block mb-1 font-medium">
               Data Dictionary (XML)
             </label>
             <input
+              ref={dataDictRef}
               type="file"
               name="dataDictionary"
               accept=".xml"
               required
               className="block w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-600 hover:border-blue-400 focus:outline-none focus:border-blue-500 cursor-pointer"
-              onChange={e =>
-                handleFilePreview(e.target.files[0], setDataDictPreview)
-              }
             />
             <button
               type="button"
-              disabled={!dataDictPreview}
-              onClick={() =>
-                openXmlModal('Data Dictionary Preview', dataDictPreview)
-              }
-              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300"
+              onClick={handleDictPreview}
+              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Preview XML
             </button>
           </div>
 
+          {/* Decision Tree */}
           <div>
             <label className="block mb-1 font-medium">
               Decision Tree (XML)
             </label>
             <input
+              ref={decisionTreeRef}
               type="file"
               name="decisionTree"
               accept=".xml"
               required
               className="block w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-600 hover:border-blue-400 focus:outline-none focus:border-blue-500 cursor-pointer"
-              onChange={e =>
-                handleFilePreview(e.target.files[0], setDecisionTreePreview)
-              }
             />
             <button
               type="button"
-              disabled={!decisionTreePreview}
-              onClick={() =>
-                openXmlModal(
-                  'Decision Tree Preview',
-                  decisionTreePreview
-                )
-              }
-              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300"
+              onClick={handleTreePreview}
+              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Preview XML
             </button>
           </div>
 
+          {/* Generate */}
           <div className="md:col-span-2 text-center">
             <button
               type="submit"
@@ -189,6 +196,7 @@ export default function Home() {
           <>
             <PartitionView partitions={data.partitions} />
             <TestCaseList testCases={data.testCases} />
+            <SyntaxTestList syntaxResults={data.syntaxResults} />
             <div className="text-center">
               <a
                 href={data.csvUrl}
