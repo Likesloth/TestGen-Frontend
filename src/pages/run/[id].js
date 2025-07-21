@@ -10,6 +10,7 @@ import {
   getRun,
   downloadEcpCsv,
   downloadSyntaxCsv,
+  downloadStateCsv,
   downloadCombinedExcel
 } from '../../api/runs'
 
@@ -27,10 +28,14 @@ export default function RunDetail() {
   const [ecpCsvUrl, setEcpCsvUrl] = useState('')
   const [synCsvUrl, setSynCsvUrl] = useState('')
   const [excelUrl, setExcelUrl] = useState('')
-console.log("ecpCsvUrl",ecpCsvUrl)
-console.log("synCsvUrl",synCsvUrl)
-console.log("excelUrl",excelUrl)
-console.log("asd")
+  const [stateValid, setStateValid] = useState([])
+  const [stateInvalid, setStateInvalid] = useState([])
+  const [stateCsvUrl, setStateCsvUrl] = useState('')
+
+  console.log("ecpCsvUrl", ecpCsvUrl)
+  console.log("synCsvUrl", synCsvUrl)
+  console.log("excelUrl", excelUrl)
+  console.log("asd")
   useEffect(() => {
     const token = localStorage.getItem('token')
     const username = localStorage.getItem('username')
@@ -54,7 +59,10 @@ console.log("asd")
         setEcpCsvUrl(downloadEcpCsv(id))
         setSynCsvUrl(downloadSyntaxCsv(id))
         setExcelUrl(downloadCombinedExcel(id))
-      
+        setStateValid(json.stateValid)
+        setStateInvalid(json.stateInvalid)
+        setStateCsvUrl(downloadStateCsv(id))
+
       })
       .catch(err => {
         console.error(err)
@@ -79,8 +87,8 @@ console.log("asd")
       <Navbar
         isLoggedIn={isLoggedIn}
         currentUser={currentUser}
-        onLoginOpen={() => {}}
-        onRegisterOpen={() => {}}
+        onLoginOpen={() => { }}
+        onRegisterOpen={() => { }}
         onLogout={handleLogout}
       />
 
@@ -126,6 +134,18 @@ console.log("asd")
           </div>
         </section>
 
+        <section className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-semibold mb-4">State Transition Tests</h3>
+          <SyntaxTestList validTests={stateValid} invalidTests={stateInvalid}  />
+          <div className="mt-4 text-center">
+            <a
+              href={stateCsvUrl}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+            >
+              Download State CSV
+            </a>
+          </div>
+        </section>
         <div className="text-center">
           <a
             href={excelUrl}

@@ -42,6 +42,12 @@ export function downloadSyntaxCsv(runId) {
   return `${BASE}/api/runs/${runId}/syntax-csv`
 }
 
+// src/api/runs.js
+export function downloadStateCsv(runId) {
+  return `${BASE}/api/runs/${runId}/state-csv`
+}
+
+
 export function downloadCombinedExcel(runId) {
   return `${BASE}/api/runs/${runId}/csv`
 }
