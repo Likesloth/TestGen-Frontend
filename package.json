@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "date-fns": "^4.1.0",
+    "gojs": "^3.0.24",
     "next": "^15.4.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -28,6 +28,7 @@ export async function getRun(runId) {
     headers: { Authorization: `Bearer ${token}` }
   })
   const json = await res.json()
+  console.log('🌐 getRun response:', json)
   if (json.success) return json
   throw new Error(json.error || 'Failed to fetch run')
 }

@@ -5,6 +5,14 @@ import Navbar from '../../components/Navbar'
 import PartitionView from '../../components/PartitionView'
 import TestCaseList from '../../components/TestCaseList'
 import SyntaxTestList from '../../components/SyntaxTestList'
+import StateTestList from '../../components/StateTestList'
+import dynamic from 'next/dynamic'
+
+const StateDiagram = dynamic(
+  () => import('../../components/StateDiagram'),
+  { ssr: false }
+)
+
 import Link from 'next/link'
 import {
   getRun,
@@ -15,6 +23,11 @@ import {
 } from '../../api/runs'
 
 export default function RunDetail() {
+  console.log('🏷️ RunDetail component function invoked — this should log every render');
+  useEffect(() => {
+    console.log('📥 RunDetail mounted on the client');
+  }, []);
+
   const router = useRouter()
   const { id } = router.query
 
@@ -28,14 +41,14 @@ export default function RunDetail() {
   const [ecpCsvUrl, setEcpCsvUrl] = useState('')
   const [synCsvUrl, setSynCsvUrl] = useState('')
   const [excelUrl, setExcelUrl] = useState('')
+
+  // state tests & model
   const [stateValid, setStateValid] = useState([])
   const [stateInvalid, setStateInvalid] = useState([])
+  const [nodes, setNodes] = useState([])
+  const [links, setLinks] = useState([])
   const [stateCsvUrl, setStateCsvUrl] = useState('')
 
-  console.log("ecpCsvUrl", ecpCsvUrl)
-  console.log("synCsvUrl", synCsvUrl)
-  console.log("excelUrl", excelUrl)
-  console.log("asd")
   useEffect(() => {
     const token = localStorage.getItem('token')
     const username = localStorage.getItem('username')
@@ -48,23 +61,35 @@ export default function RunDetail() {
   }, [router])
 
   useEffect(() => {
+    console.log('🔄 RunDetail useEffect fired, id =', id)
     if (!id) return
     getRun(id)
       .then(json => {
+        console.log('🌐 getRun returned:', json)
         if (!json.success) throw new Error(json.error || 'Failed to load')
+        // DEBUG: inspect the raw payload
+        console.log('🛰  GET /api/runs/:id payload →', json)
+        // partitions, test cases, syntax
         setPartitions(json.partitions)
         setTestCases(json.testCases)
         setSyntax(json.syntaxResults)
-        // build the three URLs
+
+        // CSV URLs
         setEcpCsvUrl(downloadEcpCsv(id))
         setSynCsvUrl(downloadSyntaxCsv(id))
         setExcelUrl(downloadCombinedExcel(id))
-        setStateValid(json.stateValid)
-        setStateInvalid(json.stateInvalid)
         setStateCsvUrl(downloadStateCsv(id))
 
+        // state tests arrays
+        setStateValid(json.stateValid)
+        setStateInvalid(json.stateInvalid)
+
+        // diagram model
+        setNodes(json.nodes || [])
+        setLinks(json.links || [])
       })
       .catch(err => {
+        console.error('❌ getRun error:', err)
         console.error(err)
         alert(err.message)
         router.push('/history')
@@ -81,6 +106,7 @@ export default function RunDetail() {
   if (loading) {
     return <div className="p-6">Loading…</div>
   }
+  console.log('🚦 State diagram data:', { nodes, links })
 
   return (
     <>
@@ -103,11 +129,13 @@ export default function RunDetail() {
           </Link>
         </div>
 
+        {/* Partitions */}
         <section className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Partitions</h3>
           <PartitionView partitions={partitions} />
         </section>
 
+        {/* ECP Test Cases */}
         <section className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">ECP Test Cases</h3>
           <TestCaseList testCases={testCases} />
@@ -121,6 +149,7 @@ export default function RunDetail() {
           </div>
         </section>
 
+        {/* Syntax Test Cases */}
         <section className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Syntax Test Cases</h3>
           <SyntaxTestList syntaxResults={syntaxResults} />
@@ -134,18 +163,36 @@ export default function RunDetail() {
           </div>
         </section>
 
+        {/* State Transition Diagram */}
         <section className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">State Transition Tests</h3>
-          <SyntaxTestList validTests={stateValid} invalidTests={stateInvalid}  />
-          <div className="mt-4 text-center">
-            <a
-              href={stateCsvUrl}
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-            >
-              Download State CSV
-            </a>
-          </div>
+          <h3 className="text-lg font-semibold mb-4">
+            State Transition Diagram
+          </h3>
+          <StateDiagram nodes={nodes} links={links} />
         </section>
+
+        {/* State Transition Tests */}
+        {(stateValid.length > 0 || stateInvalid.length > 0) && (
+          <section className="bg-white shadow rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">
+              State Transition Tests
+            </h3>
+            <StateTestList
+              validTests={stateValid}
+              invalidTests={stateInvalid}
+            />
+            <div className="mt-4 text-center">
+              <a
+                href={stateCsvUrl}
+                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+              >
+                Download State CSV
+              </a>
+            </div>
+          </section>
+        )}
+
+        {/* Combined Excel */}
         <div className="text-center">
           <a
             href={excelUrl}
