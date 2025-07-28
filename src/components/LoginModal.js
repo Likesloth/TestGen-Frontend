@@ -5,8 +5,9 @@ import { Eye, EyeOff, User, Lock, X } from 'lucide-react';
 export default function LoginModal({
   isOpen,
   onClose,
-  onLogin,      // async (username, password) => { … }
-  onOpenRegister, // optional: to switch to register modal
+  onLogin,        // async (username, password) => {}
+  onOpenRegister, // () => void
+  onForgot        // () => void
 }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -134,11 +135,7 @@ export default function LoginModal({
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 disabled={isLoading}
               >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
             {errors.password && (
@@ -166,6 +163,7 @@ export default function LoginModal({
           </div>
         </form>
 
+        {/* Footer Links */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Don’t have an account?{' '}
@@ -179,6 +177,16 @@ export default function LoginModal({
               Sign up
             </button>
           </p>
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              onForgot?.();
+            }}
+            className="mt-2 text-sm text-blue-600 hover:underline"
+          >
+            Forgot password?
+          </button>
         </div>
       </div>
     </div>

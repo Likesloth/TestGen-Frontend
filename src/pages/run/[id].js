@@ -164,12 +164,15 @@ export default function RunDetail() {
         </section>
 
         {/* State Transition Diagram */}
-        <section className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">
-            State Transition Diagram
-          </h3>
-          <StateDiagram nodes={nodes} links={links} />
-        </section>
+        {nodes?.length > 0 && (
+          <section className="bg-white shadow rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">
+              State Transition Diagram
+            </h3>
+            <StateDiagram nodes={nodes} links={links} />
+          </section>
+        )}
+
 
         {/* State Transition Tests */}
         {(stateValid.length > 0 || stateInvalid.length > 0) && (

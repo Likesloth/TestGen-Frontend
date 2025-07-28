@@ -15,7 +15,7 @@ export default function Navbar({
             href="/"
             className="text-2xl font-bold text-gray-800 hover:text-gray-900"
           >
-            TestGen Web
+            BlackBoxTestGen
           </Link>
 
           <div className="flex items-center space-x-4">

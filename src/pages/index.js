@@ -12,6 +12,7 @@ import RegisterModal from '../components/RegisterModal';
 import { generateTestRun } from '../api/generate';
 import { login, register } from '../api/auth';
 import { BASE } from '../api/runs';
+import ForgotPasswordModal from '../components/ForgotPasswordModal';
 
 const StateDiagram = dynamic(
   () => import('../components/StateDiagram'),
@@ -30,6 +31,8 @@ export default function Home() {
   const [xmlModal, setXmlModal] = useState({ open: false, title: '', content: '' });
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+
 
   const dataDictRef = useRef(null);
   const decisionTreeRef = useRef(null);
@@ -60,8 +63,8 @@ export default function Home() {
     }
   };
 
-  const handleRegister = async (username, password) => {
-    const { success, error } = await register(username, password);
+  const handleRegister = async (username, email, password) => {
+    const { success, error } = await register(username, email, password);
     if (success) {
       alert('Registration successful! Please log in.');
       setRegisterOpen(false);
@@ -230,11 +233,13 @@ export default function Home() {
               </div>
             </section>
 
-            <section className="bg-white shadow rounded-lg p-6 mt-8">
-              <h3 className="text-lg font-semibold mb-4">State Transition Diagram</h3>
-              <StateDiagram nodes={data.nodes} links={data.links} />
-            </section>
-
+            {data.nodes?.length > 0 && (
+              <section className="bg-white shadow rounded-lg p-6 mt-8">
+                <h3 className="text-lg font-semibold mb-4">State Transition Diagram</h3>
+                <StateDiagram nodes={data.nodes} links={data.links} />
+              </section>
+            )}
+            
             {(data.stateValid?.length > 0 || data.stateInvalid?.length > 0) && (
               <section className="bg-white shadow rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4">State Transition Tests</h3>
@@ -267,10 +272,15 @@ export default function Home() {
           onClose={() => setLoginOpen(false)}
           onLogin={handleLogin}
           onOpenRegister={() => {
-            setLoginOpen(false)
-            setRegisterOpen(true)
+            setLoginOpen(false);
+            setRegisterOpen(true);
+          }}
+          onForgot={() => {
+            setLoginOpen(false);
+            setForgotOpen(true);
           }}
         />
+
 
         <RegisterModal
           isOpen={registerOpen}
@@ -282,6 +292,10 @@ export default function Home() {
           }}
         />
 
+        <ForgotPasswordModal
+          isOpen={forgotOpen}
+          onClose={() => setForgotOpen(false)}
+        />
       </main>
     </>
   );
