@@ -255,9 +255,33 @@ export default function Home() {
           </>
         )}
 
-        <XMLPreviewModal isOpen={xmlModal.open} title={xmlModal.title} content={xmlModal.content} onClose={closeXmlModal} />
-        <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} onLogin={handleLogin} />
-        <RegisterModal isOpen={registerOpen} onClose={() => setRegisterOpen(false)} onRegister={handleRegister} />
+        <XMLPreviewModal
+          isOpen={xmlModal.open}
+          title={xmlModal.title}
+          content={xmlModal.content}
+          onClose={closeXmlModal}
+        />
+
+        <LoginModal
+          isOpen={loginOpen}
+          onClose={() => setLoginOpen(false)}
+          onLogin={handleLogin}
+          onOpenRegister={() => {
+            setLoginOpen(false)
+            setRegisterOpen(true)
+          }}
+        />
+
+        <RegisterModal
+          isOpen={registerOpen}
+          onClose={() => setRegisterOpen(false)}
+          onRegister={handleRegister}
+          onOpenLogin={() => {
+            setRegisterOpen(false)
+            setLoginOpen(true)
+          }}
+        />
+
       </main>
     </>
   );
