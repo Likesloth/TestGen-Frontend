@@ -24,3 +24,17 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ──────────────────────────────────────────────────
+   Hide the browser’s built‑in password‑reveal icon
+────────────────────────────────────────────────── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-textfield-decoration-button {
+  display: none;
+}
+
+input[type="password"] {
+  -webkit-appearance: none;
+  appearance: none;
+}

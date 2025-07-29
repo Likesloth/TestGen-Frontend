@@ -131,7 +131,7 @@ export default function LoginModal({
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword(s => !s)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 disabled={isLoading}
               >
@@ -164,7 +164,7 @@ export default function LoginModal({
         </form>
 
         {/* Footer Links */}
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center space-y-2">
           <p className="text-sm text-gray-600">
             Don’t have an account?{' '}
             <button
@@ -183,7 +183,7 @@ export default function LoginModal({
               onClose();
               onForgot?.();
             }}
-            className="mt-2 text-sm text-blue-600 hover:underline"
+            className="text-sm text-blue-600 hover:underline"
           >
             Forgot password?
           </button>
