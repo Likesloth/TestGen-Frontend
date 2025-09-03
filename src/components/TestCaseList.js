@@ -12,9 +12,9 @@ export default function TestCaseList({ testCases }) {
   }
 
   // Derive column names from the first test case
-  const inputKeys    = Object.keys(testCases[0].inputs);
-  const expectedKeys = Object.keys(testCases[0].expected);
-  const headers      = ['Test Case ID', ...inputKeys, ...expectedKeys];
+  const inputKeys    = Object.keys(testCases[0].inputs || {});
+  const expectedKeys = Object.keys(testCases[0].expected || {});
+  const headers      = ['Test Case ID', 'Type', ...inputKeys, ...expectedKeys];
 
   return (
     <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
@@ -41,16 +41,19 @@ export default function TestCaseList({ testCases }) {
               <td className="py-2 px-4 text-sm text-center">
                 {tc.testCaseID}
               </td>
+              <td className="py-2 px-4 text-sm text-center">
+                {tc.type ?? 'Valid'}
+              </td>
 
               {inputKeys.map(key => (
                 <td key={key} className="py-2 px-4 text-sm text-center">
-                  {tc.inputs[key]}
+                  {tc.inputs?.[key]}
                 </td>
               ))}
 
               {expectedKeys.map(key => (
                 <td key={key} className="py-2 px-4 text-sm text-center">
-                  {tc.expected[key]}
+                  {tc.expected?.[key]}
                 </td>
               ))}
             </tr>
