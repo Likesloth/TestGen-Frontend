@@ -9,6 +9,7 @@ import StateTestList from '../components/StateTestList';
 import XMLPreviewModal from '../components/XMLPreviewModal';
 import LoginModal from '../components/LoginModal';
 import RegisterModal from '../components/RegisterModal';
+import StateSequenceList from '../components/StateSequenceList';
 import { generateTestRun } from '../api/generate';
 import { login, register } from '../api/auth';
 import { BASE } from '../api/runs';
@@ -123,6 +124,7 @@ export default function Home() {
           syntaxResults: json.syntaxResults,
           stateValid: json.stateValid,
           stateInvalid: json.stateInvalid,
+          stateSequences: json.stateSequences || [],
           nodes,
           links,
           csvUrl: combinedUrl,
@@ -239,11 +241,13 @@ export default function Home() {
                 <StateDiagram nodes={data.nodes} links={data.links} />
               </section>
             )}
-            
+
             {(data.stateValid?.length > 0 || data.stateInvalid?.length > 0) && (
               <section className="bg-white shadow rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4">State Transition Tests</h3>
                 <StateTestList validTests={data.stateValid} invalidTests={data.stateInvalid} />
+                {/* <h3 className="text-lg font-semibold mb-4">State Sequences</h3> */}
+                <StateSequenceList sequences={data.stateSequences} />
                 <div className="mt-4 text-center">
                   <a href={data.stateCsvUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
                     Download State CSV
@@ -251,6 +255,24 @@ export default function Home() {
                 </div>
               </section>
             )}
+
+            {/* {data.stateSequences?.length > 0 && (
+              <section className="bg-white shadow rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">State Sequences</h3>
+                <StateSequenceList sequences={data.stateSequences} />
+                <div className="mt-4 text-center">
+                  <a
+                    href={data.stateCsvUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                  >
+                    Download State CSV
+                  </a>
+                </div>
+              </section>
+            )} */}
+
 
             <div className="text-center mt-6">
               <a href={data.csvUrl} target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700">
