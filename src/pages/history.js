@@ -1,4 +1,4 @@
-// src/pages/history.js
+﻿// src/pages/history.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
@@ -30,7 +30,7 @@ export default function HistoryPage() {
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
-      router.push('/'); // not logged in → back to main
+      router.push('/'); // not logged in — back to main
     }
   }, [router]);
 
@@ -43,7 +43,7 @@ export default function HistoryPage() {
   };
 
   if (loading) {
-    return <div className="p-6">Loading history…</div>;
+    return <div className="p-6">Loading history...</div>;
   }
 
   return (

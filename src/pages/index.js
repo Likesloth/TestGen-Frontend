@@ -1,4 +1,4 @@
-// src/pages/index.js
+﻿// src/pages/index.js
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Navbar from '../components/Navbar';
@@ -19,7 +19,7 @@ const StateDiagram = dynamic(
   () => import('../components/StateDiagram'),
   {
     ssr: false,
-    loading: () => <p>Loading diagram…</p>
+    loading: () => <p>Loading diagram...</p>
   }
 );
 
@@ -203,7 +203,7 @@ export default function Home() {
 
           <div className="md:col-span-3 text-center">
             <button type="submit" disabled={loading} className="w-full md:w-auto px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700">
-              {loading ? 'Generating…' : 'Generate & Save'}
+              {loading ? 'Generating...' : 'Generate & Save'}
             </button>
           </div>
         </form>

@@ -1,4 +1,4 @@
-// src/components/ForgotPasswordModal.js
+﻿// src/components/ForgotPasswordModal.js
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { requestPasswordReset } from '../api/auth';
@@ -56,7 +56,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
 
         {sent ? (
           <p className="text-green-600">
-            If an account with that email exists, you’ll receive a reset link shortly.
+            If an account with that email exists, you'll receive a reset link shortly.
           </p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,7 +86,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                 disabled={loading}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                {loading ? 'Sending…' : 'Send Reset Link'}
+                {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
             </div>
           </form>

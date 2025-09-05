@@ -1,15 +1,7 @@
 // src/api/runs.js
 export const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
-export async function generateTestRun(formData) {
-  const token = localStorage.getItem('token')
-  const res = await fetch(`${BASE}/api/runs`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: formData
-  })
-  return res.json()
-}
+// Note: test run creation lives in `src/api/generate.js`
 
 export async function listRuns() {
   const token = localStorage.getItem('token')

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 export default function SyntaxTestList({ syntaxResults }) {
   if (!syntaxResults || !syntaxResults.length) {
@@ -7,7 +7,7 @@ export default function SyntaxTestList({ syntaxResults }) {
 
   return (
     <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
-      <h2 className="text-lg font-semibold mb-4">Syntax‐Based Test Cases</h2>
+      <h2 className="text-lg font-semibold mb-4">Syntax-Based Test Cases</h2>
       <table className="min-w-full table-auto">
         <thead className="bg-gray-100">
           <tr>

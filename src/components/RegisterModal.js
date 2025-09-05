@@ -1,11 +1,11 @@
-// src/components/RegisterModal.js
+﻿// src/components/RegisterModal.js
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, X, Mail } from 'lucide-react';
 
 export default function RegisterModal({
   isOpen,
   onClose,
-  onRegister,    // async (username, email, password) => { … }
+  onRegister,
   onOpenLogin,   // optional: to switch back to login
 }) {
   const [username, setUsername] = useState('');
@@ -50,8 +50,7 @@ export default function RegisterModal({
     if (!password) {
       newErrors.password = 'Password is required';
     } else if (!strongPwRegex.test(password)) {
-      newErrors.password =
-        'Password must be ≥8 chars, include lowercase, uppercase, number & special char';
+      newErrors.password = 'Password must be at least 8 chars, include lowercase, uppercase, number & special char';
     }
 
     setErrors(newErrors);
@@ -175,7 +174,7 @@ export default function RegisterModal({
                     ? 'border-red-300 focus:ring-red-500/20'
                     : 'border-gray-300 focus:ring-green-500/20'
                 }`}
-                placeholder="••••••••"
+                placeholder="Your password"
                 disabled={isLoading}
                 required
               />
@@ -200,7 +199,7 @@ export default function RegisterModal({
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-3 rounded-xl hover:from-green-700 hover:to-green-800 disabled:opacity-50"
             >
-              {isLoading ? 'Creating…' : 'Create Account'}
+              {isLoading ? 'Creating...' : 'Create Account'}
             </button>
             <button
               type="button"

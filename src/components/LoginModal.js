@@ -1,4 +1,4 @@
-// src/components/LoginModal.js
+﻿// src/components/LoginModal.js
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, X } from 'lucide-react';
 
@@ -125,7 +125,7 @@ export default function LoginModal({
                     ? 'border-red-300 focus:ring-red-500/20'
                     : 'border-gray-300 focus:ring-blue-500/20'
                 }`}
-                placeholder="••••••••"
+                placeholder="Your password"
                 disabled={isLoading}
                 required
               />
@@ -150,7 +150,7 @@ export default function LoginModal({
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50"
             >
-              {isLoading ? 'Signing in…' : 'Sign In'}
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
             <button
               type="button"
@@ -166,7 +166,7 @@ export default function LoginModal({
         {/* Footer Links */}
         <div className="mt-6 text-center space-y-2">
           <p className="text-sm text-gray-600">
-            Don’t have an account?{' '}
+            Don't have an account?{' '}
             <button
               onClick={() => {
                 onClose();

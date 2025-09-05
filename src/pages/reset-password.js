@@ -2,6 +2,7 @@
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { resetPassword } from '../api/auth'
 
 export default function ResetPassword() {
   const router = useRouter()
@@ -22,15 +23,7 @@ export default function ResetPassword() {
       setError("Passwords don't match")
       return
     }
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-password`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword })
-      }
-    )
-    const json = await res.json()
+    const json = await resetPassword(token, newPassword)
     if (json.success) {
       setMessage('Password reset! Redirecting to login…')
       setTimeout(() => router.push('/'), 2000)
