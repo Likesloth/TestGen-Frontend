@@ -56,7 +56,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
 
         {sent ? (
           <p className="text-green-600">
-            If an account with that email exists, you'll receive a reset link shortly.
+            If an account with that email exists, you&apos;ll receive a reset link shortly.
           </p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
