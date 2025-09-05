@@ -38,7 +38,7 @@ export default function StateDiagram({ nodes = [], links = [] }) {
         })
       );
 
-    // Link template with smarter routing
+    // Link template with smarter routing (no labels)
     diagram.linkTemplate =
       $(go.Link,
         {
@@ -50,15 +50,7 @@ export default function StateDiagram({ nodes = [], links = [] }) {
           relinkableTo: false
         },
         $(go.Shape),
-        $(go.Shape, { toArrow: 'Standard' }),
-        $(go.TextBlock,
-          {
-            segmentOffset: new go.Point(0, -10),
-            font: '12px sans-serif',
-            background: 'white'
-          },
-          new go.Binding('text', 'text')
-        )
+        $(go.Shape, { toArrow: 'Standard' })
       );
 
     diagram.model = new go.GraphLinksModel(nodes, links);

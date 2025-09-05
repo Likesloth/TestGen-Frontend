@@ -10,7 +10,7 @@ export default function StateSequenceList({ sequences = [] }) {
       <table className="min-w-full table-auto">
         <thead className="bg-gray-100">
           <tr>
-            {['Test Case ID', 'Sequence of Transitions '].map((h, i) => (
+            {['Test Case ID', 'Sequence of Transitions'].map((h, i) => (
               <th
                 key={h}
                 className={`py-2 px-4 text-sm font-medium text-gray-600 ${i === 1 ? 'text-left' : 'text-center'}`}
@@ -31,7 +31,7 @@ export default function StateSequenceList({ sequences = [] }) {
               >
                 <td className="py-2 px-4 text-sm text-center">{s.seqCaseID}</td>
                 <td className="py-2 px-4 text-sm text-left">
-                  {seq.join(' → ')}
+                  {seq.join(' -> ')}
                 </td>
               </tr>
             );
