@@ -14,7 +14,7 @@ export default function TestCaseList({ testCases }) {
   // Derive column names from the first test case
   const inputKeys    = Object.keys(testCases[0].inputs || {});
   const expectedKeys = Object.keys(testCases[0].expected || {});
-  const headers      = ['Test Case ID', 'Type', ...inputKeys, ...expectedKeys];
+  const headers      = ['Test Case ID', 'Type', ...inputKeys, ...expectedKeys, 'Coverage (%)'];
 
   return (
     <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
@@ -33,7 +33,10 @@ export default function TestCaseList({ testCases }) {
           </tr>
         </thead>
         <tbody>
-          {testCases.map((tc, idx) => (
+          {testCases.map((tc, idx) => {
+            const computedCoverage = ((idx + 1) / testCases.length) * 100;
+            const coverage = typeof tc.coverage === 'number' ? tc.coverage : computedCoverage;
+            return (
             <tr
               key={tc.testCaseID}
               className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
@@ -56,8 +59,13 @@ export default function TestCaseList({ testCases }) {
                   {tc.expected?.[key]}
                 </td>
               ))}
+
+              <td className="py-2 px-4 text-sm text-center">
+                {`${coverage.toFixed(2)}%`}
+              </td>
             </tr>
-          ))}
+            )
+          })}
         </tbody>
       </table>
     </section>
