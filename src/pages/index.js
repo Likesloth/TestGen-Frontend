@@ -10,6 +10,13 @@ import XMLPreviewModal from '../components/XMLPreviewModal';
 import LoginModal from '../components/LoginModal';
 import RegisterModal from '../components/RegisterModal';
 import StateSequenceList from '../components/StateSequenceList';
+const SequenceDiagram = dynamic(
+  () => import('../components/SequenceDiagram'),
+  {
+    ssr: false,
+    loading: () => <p>Loading sequence diagram...</p>
+  }
+);
 import { generateTestRun } from '../api/generate';
 import { login, register } from '../api/auth';
 import { BASE } from '../api/runs';
@@ -127,6 +134,10 @@ export default function Home() {
           stateSequences: json.stateSequences || [],
           nodes,
           links,
+          seqNodes: json.seqNodes || [],
+          seqLinks: json.seqLinks || [],
+          stateTreeNodes: json.stateTreeNodes || [],
+          stateTreeLinks: json.stateTreeLinks || [],
           csvUrl: combinedUrl,
           ecpCsvUrl: ecpUrl,
           syntaxCsvUrl: syntaxUrl,
@@ -235,10 +246,22 @@ export default function Home() {
               </div>
             </section>
 
-            {data.nodes?.length > 0 && (
+            {(data.stateTreeNodes?.length > 0 || data.seqNodes?.length > 0 || data.nodes?.length > 0) && (
               <section className="bg-white shadow rounded-lg p-6 mt-8">
-                <h3 className="text-lg font-semibold mb-4">State Transition Diagram</h3>
-                <StateDiagram nodes={data.nodes} links={data.links} />
+                <h3 className="text-lg font-semibold mb-4">
+                  {data.stateTreeNodes?.length > 0
+                    ? 'State Tree'
+                    : data.seqNodes?.length > 0
+                      ? 'State Sequence Tree'
+                      : 'State Transition Diagram'}
+                </h3>
+                {data.stateTreeNodes?.length > 0 ? (
+                  <SequenceDiagram nodes={data.stateTreeNodes} links={data.stateTreeLinks} />
+                ) : data.seqNodes?.length > 0 ? (
+                  <SequenceDiagram nodes={data.seqNodes} links={data.seqLinks} />
+                ) : (
+                  <StateDiagram nodes={data.nodes} links={data.links} />
+                )}
               </section>
             )}
 
@@ -255,6 +278,7 @@ export default function Home() {
                 </div>
               </section>
             )}
+            {/* Tree is shown above if available; no duplicate section here */}
 
             {/* {data.stateSequences?.length > 0 && (
               <section className="bg-white shadow rounded-lg p-6">

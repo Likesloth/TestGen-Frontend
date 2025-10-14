@@ -1,27 +1,38 @@
 // src/components/XMLPreviewModal.js
 import React from 'react';
+import { X } from 'lucide-react';
 
 export default function XMLPreviewModal({ isOpen, title, content, onClose }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-1/2 max-h-[90vh] overflow-auto">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-600 hover:text-gray-800 text-xl leading-none"
-          >
-            &times;
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+            <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
-        <div className="p-4 whitespace-pre-wrap text-xs">
-          {content}
+
+        {/* Content */}
+        <div className="border rounded-xl bg-gray-50 p-4 overflow-auto max-h-[60vh]">
+          <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800">
+            {content}
+          </pre>
         </div>
-        <div className="flex justify-end p-4 border-t">
+
+        {/* Footer */}
+        <div className="flex justify-end mt-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
           >
             Close
           </button>
