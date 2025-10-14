@@ -8,7 +8,7 @@ export default function StateTestList({ validTests = [], invalidTests = [] }) {
     <>
       {/* Valid State Transitions */}
       <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
-        <h2 className="text-lg font-semibold mb-4">Valid State Transitions</h2>
+        <h2 className="text-lg font-semibold mb-4">Valid Single State Transitions Test Cases</h2>
         <table className="min-w-full table-auto">
           <thead className="bg-gray-100">
             <tr>
@@ -46,7 +46,8 @@ export default function StateTestList({ validTests = [], invalidTests = [] }) {
 
       {/* Invalid State Transitions */}
       <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
-        <h2 className="text-lg font-semibold mb-4">Invalid State Transitions</h2>
+        <h2 className="text-lg font-semibold mb-4">Invalid Single State Transitions Test CasesGenerated Test Cases
+</h2>
         <table className="min-w-full table-auto">
           <thead className="bg-gray-100">
             <tr>

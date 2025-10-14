@@ -1,6 +1,7 @@
 // src/components/StateDiagram.js
 import React, { useEffect, useRef } from 'react';
 import * as go from 'gojs';
+import { downloadPNG as savePNG, downloadSVG as saveSVG } from '../lib/diagramExport';
 
 // Preprocess graph so that each route ends at a separate final node.
 // A final node is detected as any node with zero outgoing links.
@@ -189,30 +190,8 @@ export default function StateDiagram({ nodes = [], links = [] }) {
     };
   }, [nodes, links]);
 
-  const downloadPNG = () => {
-    const imgData = diagramInstance.current.makeImageData({
-      background: 'white',
-      scale: 1
-    });
-    const a = document.createElement('a');
-    a.href = imgData;
-    a.download = 'state-diagram.png';
-    a.click();
-  };
-
-  const downloadSVG = () => {
-    const svg = diagramInstance.current.makeSvg({
-      scale: 1,
-      background: 'white'
-    });
-    const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'state-diagram.svg';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const downloadPNG = () => savePNG(diagramInstance.current, 'state-diagram');
+  const downloadSVG = () => saveSVG(diagramInstance.current, 'state-diagram');
 
   return (
     <div>

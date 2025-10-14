@@ -5,7 +5,7 @@ export default function TestCaseList({ testCases }) {
   if (!testCases || testCases.length === 0) {
     return (
       <section className="mt-12 bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Generated Test Cases</h2>
+        <h2 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h2>
         <p className="text-gray-600">No test cases to display.</p>
       </section>
     );
@@ -18,7 +18,7 @@ export default function TestCaseList({ testCases }) {
 
   return (
     <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
-      <h2 className="text-lg font-semibold mb-4">Generated Test Cases</h2>
+      <h2 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h2>
       <table className="min-w-full table-auto">
         <thead className="bg-gray-100">
           <tr>

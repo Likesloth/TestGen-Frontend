@@ -125,12 +125,21 @@ export default function Home() {
         const syntaxUrl = `${BASE}/api/runs/${runId}/syntax-csv`;
         const stateUrl = `${BASE}/api/runs/${runId}/state-csv`;
 
+        // Derive valid/invalid from stateTests if explicit arrays are not provided
+        const allStateTests = Array.isArray(json.stateTests) ? json.stateTests : [];
+        const derivedValid = Array.isArray(json.stateValid) && json.stateValid.length > 0
+          ? json.stateValid
+          : allStateTests.filter(t => String(t.type || '').toLowerCase() === 'valid');
+        const derivedInvalid = Array.isArray(json.stateInvalid) && json.stateInvalid.length > 0
+          ? json.stateInvalid
+          : allStateTests.filter(t => String(t.type || '').toLowerCase() === 'invalid');
+
         setData({
           partitions: json.partitions,
           testCases: json.testCases,
           syntaxResults: json.syntaxResults,
-          stateValid: json.stateValid,
-          stateInvalid: json.stateInvalid,
+          stateValid: derivedValid,
+          stateInvalid: derivedInvalid,
           stateSequences: json.stateSequences || [],
           nodes,
           links,
@@ -227,7 +236,7 @@ export default function Home() {
             </section>
 
             <section className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">ECP Test Cases</h3>
+              <h3 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h3>
               <TestCaseList testCases={data.testCases} />
               <div className="mt-4 text-center">
                 <a href={data.ecpCsvUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
@@ -250,7 +259,7 @@ export default function Home() {
               <section className="bg-white shadow rounded-lg p-6 mt-8">
                 <h3 className="text-lg font-semibold mb-4">
                   {data.stateTreeNodes?.length > 0
-                    ? 'State Tree'
+                    ? 'State Tree Diagram'
                     : data.seqNodes?.length > 0
                       ? 'State Sequence Tree'
                       : 'State Transition Diagram'}
@@ -267,7 +276,7 @@ export default function Home() {
 
             {(data.stateValid?.length > 0 || data.stateInvalid?.length > 0) && (
               <section className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4">State Transition Tests</h3>
+                <h3 className="text-lg font-semibold mb-4">State Transition Test Cases</h3>
                 <StateTestList validTests={data.stateValid} invalidTests={data.stateInvalid} />
                 {/* <h3 className="text-lg font-semibold mb-4">State Sequences</h3> */}
                 <StateSequenceList sequences={data.stateSequences} />

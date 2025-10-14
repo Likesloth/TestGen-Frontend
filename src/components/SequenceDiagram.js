@@ -1,6 +1,7 @@
 // src/components/SequenceDiagram.js
 import React, { useEffect, useRef } from 'react';
 import * as go from 'gojs';
+import { downloadPNG as savePNG, downloadSVG as saveSVG } from '../lib/diagramExport';
 
 export default function SequenceDiagram({ nodes = [], links = [] }) {
   const diagramRef = useRef(null);
@@ -56,24 +57,8 @@ export default function SequenceDiagram({ nodes = [], links = [] }) {
     };
   }, [nodes, links]);
 
-  const downloadPNG = () => {
-    const imgData = diagramInstance.current.makeImageData({ background: 'white', scale: 1 });
-    const a = document.createElement('a');
-    a.href = imgData;
-    a.download = 'sequence-diagram.png';
-    a.click();
-  };
-
-  const downloadSVG = () => {
-    const svg = diagramInstance.current.makeSvg({ scale: 1, background: 'white' });
-    const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'sequence-diagram.svg';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const downloadPNG = () => savePNG(diagramInstance.current, 'sequence-diagram');
+  const downloadSVG = () => saveSVG(diagramInstance.current, 'sequence-diagram');
 
   return (
     <div>
