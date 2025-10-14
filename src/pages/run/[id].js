@@ -12,6 +12,10 @@ const StateDiagram = dynamic(
   () => import('../../components/StateDiagram'),
   { ssr: false }
 )
+const SequenceDiagram = dynamic(
+  () => import('../../components/SequenceDiagram'),
+  { ssr: false }
+)
 
 import Link from 'next/link'
 import {
@@ -23,10 +27,6 @@ import {
 } from '../../api/runs'
 
 export default function RunDetail() {
-  console.log('🏷️ RunDetail component function invoked — this should log every render');
-  useEffect(() => {
-    console.log('📥 RunDetail mounted on the client');
-  }, []);
 
   const router = useRouter()
   const { id } = router.query
@@ -47,6 +47,10 @@ export default function RunDetail() {
   const [stateInvalid, setStateInvalid] = useState([])
   const [nodes, setNodes] = useState([])
   const [links, setLinks] = useState([])
+  const [seqNodes, setSeqNodes] = useState([])
+  const [seqLinks, setSeqLinks] = useState([])
+  const [treeNodes, setTreeNodes] = useState([])
+  const [treeLinks, setTreeLinks] = useState([])
   const [stateCsvUrl, setStateCsvUrl] = useState('')
 
   useEffect(() => {
@@ -61,14 +65,10 @@ export default function RunDetail() {
   }, [router])
 
   useEffect(() => {
-    console.log('🔄 RunDetail useEffect fired, id =', id)
     if (!id) return
     getRun(id)
       .then(json => {
-        console.log('🌐 getRun returned:', json)
         if (!json.success) throw new Error(json.error || 'Failed to load')
-        // DEBUG: inspect the raw payload
-        console.log('🛰  GET /api/runs/:id payload →', json)
         // partitions, test cases, syntax
         setPartitions(json.partitions)
         setTestCases(json.testCases)
@@ -87,10 +87,14 @@ export default function RunDetail() {
         // diagram model
         setNodes(json.nodes || [])
         setLinks(json.links || [])
+        // sequence tree model (legacy)
+        setSeqNodes(json.seqNodes || [])
+        setSeqLinks(json.seqLinks || [])
+        // new state tree model
+        setTreeNodes(json.stateTreeNodes || [])
+        setTreeLinks(json.stateTreeLinks || [])
       })
       .catch(err => {
-        console.error('❌ getRun error:', err)
-        console.error(err)
         alert(err.message)
         router.push('/history')
       })
@@ -106,7 +110,6 @@ export default function RunDetail() {
   if (loading) {
     return <div className="p-6">Loading…</div>
   }
-  console.log('🚦 State diagram data:', { nodes, links })
 
   return (
     <>
@@ -163,13 +166,23 @@ export default function RunDetail() {
           </div>
         </section>
 
-        {/* State Transition Diagram */}
-        {nodes?.length > 0 && (
+        {/* State diagram area: prefer new state tree, then seq tree, else model */}
+        {(treeNodes?.length > 0 || seqNodes?.length > 0 || nodes?.length > 0) && (
           <section className="bg-white shadow rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">
-              State Transition Diagram
+              {treeNodes?.length > 0
+                ? 'State Tree'
+                : seqNodes?.length > 0
+                  ? 'State Sequence Tree'
+                  : 'State Transition Diagram'}
             </h3>
-            <StateDiagram nodes={nodes} links={links} />
+            {treeNodes?.length > 0 ? (
+              <SequenceDiagram nodes={treeNodes} links={treeLinks} />
+            ) : seqNodes?.length > 0 ? (
+              <SequenceDiagram nodes={seqNodes} links={seqLinks} />
+            ) : (
+              <StateDiagram nodes={nodes} links={links} />
+            )}
           </section>
         )}
 

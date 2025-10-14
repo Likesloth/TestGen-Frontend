@@ -67,6 +67,52 @@ function separateFinalNodesPerRoute(nodes = [], links = []) {
   return { nodes: newNodes, links: newLinks };
 }
 
+// Duplicate any node that has more than one incoming link so that
+// each parent points to its own instance. This prevents back-edges
+// like Occupied -> Vacant from reusing the original Vacant node.
+function separateNodesPerIncoming(nodes = [], links = []) {
+  const incomingByTo = new Map();
+  links.forEach((l, idx) => {
+    const to = l.to;
+    if (!incomingByTo.has(to)) incomingByTo.set(to, []);
+    incomingByTo.get(to).push(idx);
+  });
+
+  const nodeByKey = new Map(nodes.map(n => [n.key, { ...n }]));
+  const newNodes = nodes.map(n => ({ ...n }));
+  const newLinks = links.map(l => ({ ...l }));
+
+  for (const [toKey, incomingIdxs] of incomingByTo.entries()) {
+    if (!toKey) continue;
+    if (!incomingIdxs || incomingIdxs.length <= 1) continue;
+
+    // Keep the first incoming pointing to the original node.
+    // For all additional incoming links, create a unique clone target.
+    for (let i = 1; i < incomingIdxs.length; i++) {
+      const idx = incomingIdxs[i];
+      const link = newLinks[idx];
+
+      // Create a unique key for the clone
+      let cloneKey = `${toKey}`;
+      let attempt = 1;
+      while (nodeByKey.has(cloneKey)) {
+        attempt += 1;
+        cloneKey = `${toKey}${attempt}`;
+      }
+
+      const baseNode = nodeByKey.get(toKey) || { key: toKey };
+      const cloned = { ...baseNode, key: cloneKey, label: baseNode.label || baseNode.key };
+      newNodes.push(cloned);
+      nodeByKey.set(cloneKey, cloned);
+
+      // Rewire this incoming link to the unique clone
+      newLinks[idx] = { ...link, to: cloneKey };
+    }
+  }
+
+  return { nodes: newNodes, links: newLinks };
+}
+
 export default function StateDiagram({ nodes = [], links = [] }) {
   const diagramRef = useRef(null);
   const diagramInstance = useRef(null);
@@ -103,7 +149,7 @@ export default function StateDiagram({ nodes = [], links = [] }) {
         })
       );
 
-    // Link template with smarter routing (no labels)
+    // Link template with smarter routing + optional text labels (events)
     diagram.linkTemplate =
       $(go.Link,
         {
@@ -115,11 +161,26 @@ export default function StateDiagram({ nodes = [], links = [] }) {
           relinkableTo: false
         },
         $(go.Shape),
-        $(go.Shape, { toArrow: 'Standard' })
+        $(go.Shape, { toArrow: 'Standard' }),
+        // Centered label if link has a 'text' property
+        $(go.Panel, 'Auto',
+          { segmentIndex: NaN, segmentFraction: 0.5 },
+          $(go.Shape, { fill: 'rgba(255,255,255,0.85)', stroke: null }),
+          $(go.TextBlock,
+            {
+              margin: 3,
+              font: '10px sans-serif',
+              stroke: '#333'
+            },
+            new go.Binding('text', 'text')
+          )
+        )
       );
 
-    // Ensure final nodes are separated per route for clearer diagrams
-    const processed = separateFinalNodesPerRoute(nodes, links);
+    // First, duplicate nodes that have multiple incoming links
+    const splitIncoming = separateNodesPerIncoming(nodes, links);
+    // Then, ensure final nodes are separated per route for clearer diagrams
+    const processed = separateFinalNodesPerRoute(splitIncoming.nodes, splitIncoming.links);
     diagram.model = new go.GraphLinksModel(processed.nodes, processed.links);
     diagramInstance.current = diagram;
 
