@@ -6,6 +6,7 @@ import PartitionView from '../../components/PartitionView'
 import TestCaseList from '../../components/TestCaseList'
 import SyntaxTestList from '../../components/SyntaxTestList'
 import StateTestList from '../../components/StateTestList'
+import StateSequenceList from '../../components/StateSequenceList'
 import dynamic from 'next/dynamic'
 
 const StateDiagram = dynamic(
@@ -25,14 +26,13 @@ import {
   downloadStateCsv,
   downloadCombinedExcel
 } from '../../api/runs'
+import { useAuth } from '../../context/AuthContext'
 
 export default function RunDetail() {
 
   const router = useRouter()
   const { id } = router.query
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [currentUser, setCurrentUser] = useState('')
+  const auth = useAuth()
 
   const [loading, setLoading] = useState(true)
   const [partitions, setPartitions] = useState([])
@@ -52,17 +52,13 @@ export default function RunDetail() {
   const [treeNodes, setTreeNodes] = useState([])
   const [treeLinks, setTreeLinks] = useState([])
   const [stateCsvUrl, setStateCsvUrl] = useState('')
+  const [stateSequences, setStateSequences] = useState([])
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const username = localStorage.getItem('username')
-    if (token && username) {
-      setIsLoggedIn(true)
-      setCurrentUser(username)
-    } else {
+    if (!auth.isLoggedIn) {
       router.push('/')
     }
-  }, [router])
+  }, [router, auth.isLoggedIn])
 
   useEffect(() => {
     if (!id) return
@@ -80,9 +76,16 @@ export default function RunDetail() {
         setExcelUrl(downloadCombinedExcel(id))
         setStateCsvUrl(downloadStateCsv(id))
 
-        // state tests arrays
-        setStateValid(json.stateValid)
-        setStateInvalid(json.stateInvalid)
+        // state tests arrays (derive from stateTests if not present)
+        const allStateTests = Array.isArray(json.stateTests) ? json.stateTests : []
+        const derivedValid = Array.isArray(json.stateValid) && json.stateValid.length > 0
+          ? json.stateValid
+          : allStateTests.filter(t => String(t.type || '').toLowerCase() === 'valid')
+        const derivedInvalid = Array.isArray(json.stateInvalid) && json.stateInvalid.length > 0
+          ? json.stateInvalid
+          : allStateTests.filter(t => String(t.type || '').toLowerCase() === 'invalid')
+        setStateValid(derivedValid)
+        setStateInvalid(derivedInvalid)
 
         // diagram model
         setNodes(json.nodes || [])
@@ -93,6 +96,8 @@ export default function RunDetail() {
         // new state tree model
         setTreeNodes(json.stateTreeNodes || [])
         setTreeLinks(json.stateTreeLinks || [])
+        // state sequences
+        setStateSequences(Array.isArray(json.stateSequences) ? json.stateSequences : [])
       })
       .catch(err => {
         alert(err.message)
@@ -102,8 +107,7 @@ export default function RunDetail() {
   }, [id, router])
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('username')
+    auth.logout()
     router.push('/')
   }
 
@@ -114,8 +118,8 @@ export default function RunDetail() {
   return (
     <>
       <Navbar
-        isLoggedIn={isLoggedIn}
-        currentUser={currentUser}
+        isLoggedIn={auth.isLoggedIn}
+        currentUser={auth.user}
         onLoginOpen={() => { }}
         onRegisterOpen={() => { }}
         onLogout={handleLogout}
@@ -140,7 +144,7 @@ export default function RunDetail() {
 
         {/* ECP Test Cases */}
         <section className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">ECP Test Cases</h3>
+          <h3 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h3>
           <TestCaseList testCases={testCases} />
           <div className="mt-4 text-center">
             <a
@@ -171,7 +175,7 @@ export default function RunDetail() {
           <section className="bg-white shadow rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">
               {treeNodes?.length > 0
-                ? 'State Tree'
+                ? 'State Tree Diagram'
                 : seqNodes?.length > 0
                   ? 'State Sequence Tree'
                   : 'State Transition Diagram'}
@@ -191,7 +195,7 @@ export default function RunDetail() {
         {(stateValid.length > 0 || stateInvalid.length > 0) && (
           <section className="bg-white shadow rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">
-              State Transition Tests
+              State Transition Test Cases
             </h3>
             <StateTestList
               validTests={stateValid}
@@ -205,6 +209,14 @@ export default function RunDetail() {
                 Download State CSV
               </a>
             </div>
+          </section>
+        )}
+
+        {/* State Sequences */}
+        {stateSequences.length > 0 && (
+          <section className="bg-white shadow rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Sequences State Transitions Test Cases</h3>
+            <StateSequenceList sequences={stateSequences} />
           </section>
         )}
 

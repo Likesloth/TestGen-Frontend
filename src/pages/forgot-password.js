@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
+import { requestPasswordReset } from '../api/auth';
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -19,12 +20,7 @@ export default function ForgotPassword() {
     }
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/sent-request-forget-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const json = await res.json();
+      const json = await requestPasswordReset(email);
       if (json.success) {
         setSubmitted(true);
       } else {

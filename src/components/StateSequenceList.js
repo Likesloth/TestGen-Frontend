@@ -28,7 +28,7 @@ export default function StateSequenceList({ sequences = [] }) {
 
   return (
     <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
-      <h2 className="text-lg font-semibold mb-4">State Sequences</h2>
+      <h2 className="text-lg font-semibold mb-4">Sequences State Transitions Test Case</h2>
 
       <table className="min-w-full table-auto">
         <thead className="bg-gray-100">
