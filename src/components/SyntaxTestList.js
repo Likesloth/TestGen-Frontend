@@ -6,17 +6,18 @@ export default function SyntaxTestList({ syntaxResults }) {
   }
 
   return (
-    <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
+    <section className="mt-12 bg-white shadow rounded-lg p-6">
       <h2 className="text-lg font-semibold mb-4">Syntax-Based Test Cases</h2>
-      <table className="min-w-full table-auto">
-        <thead className="bg-gray-100">
+      <div className="relative -mx-6 px-6 overflow-x-auto">
+      <table className="min-w-full table-auto text-sm">
+        <thead className="bg-gray-50 sticky top-0 z-10">
           <tr>
-            <th className="py-2 px-4 text-sm font-medium text-gray-600">Field</th>
-            <th className="py-2 px-4 text-sm font-medium text-gray-600">Valid</th>
-            <th className="py-2 px-4 text-sm font-medium text-gray-600">Invalid Value</th>
-            <th className="py-2 px-4 text-sm font-medium text-gray-600">Omission</th>
-            <th className="py-2 px-4 text-sm font-medium text-gray-600">Addition</th>
-            <th className="py-2 px-4 text-sm font-medium text-gray-600">Substitution</th>
+            <th className="py-2 px-4 font-medium text-ink-700">Field</th>
+            <th className="py-2 px-4 font-medium text-ink-700">Valid</th>
+            <th className="py-2 px-4 font-medium text-ink-700">Invalid Value</th>
+            <th className="py-2 px-4 font-medium text-ink-700">Omission</th>
+            <th className="py-2 px-4 font-medium text-ink-700">Addition</th>
+            <th className="py-2 px-4 font-medium text-ink-700">Substitution</th>
           </tr>
         </thead>
         <tbody>
@@ -32,6 +33,7 @@ export default function SyntaxTestList({ syntaxResults }) {
           ))}
         </tbody>
       </table>
+      </div>
     </section>
   );
 }

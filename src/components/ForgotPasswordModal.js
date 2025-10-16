@@ -1,6 +1,7 @@
 ﻿// src/components/ForgotPasswordModal.js
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import Button from './ui/button';
 import { requestPasswordReset } from '../api/auth';
 
 export default function ForgotPasswordModal({ isOpen, onClose }) {
@@ -48,7 +49,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold">Forgot Password</h3>
+          <h3 className="text-xl font-bold text-ink-900">Forgot Password</h3>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -61,33 +62,20 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label className="block text-sm font-medium text-ink-900 mb-1">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-ink-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-600"
                 placeholder="you@example.com"
                 disabled={loading}
               />
               {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
             </div>
             <div className="flex justify-end space-x-2">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={loading}
-                className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                {loading ? 'Sending...' : 'Send Reset Link'}
-              </button>
+              <Button type="button" onClick={onClose} disabled={loading} variant="secondary">Cancel</Button>
+              <Button type="submit" loading={loading}>Send Reset Link</Button>
             </div>
           </form>
         )}

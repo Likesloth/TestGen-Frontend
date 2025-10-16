@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Button from './ui/button';
 
 export default function Navbar({
   isLoggedIn,
@@ -37,30 +38,21 @@ export default function Navbar({
 
             {!isLoggedIn ? (
               <>
-                <button
-                  onClick={onLoginOpen}
-                  className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Login
-                </button>
-                <button
-                  onClick={onRegisterOpen}
-                  className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                >
-                  Register
-                </button>
+                <Button onClick={onLoginOpen} variant="primary" size="sm">
+                  Sign in
+                </Button>
+                <Button onClick={onRegisterOpen} variant="secondary" size="sm">
+                  Create account
+                </Button>
               </>
             ) : (
               <>
                 <span className="px-3 py-2 text-gray-700">
                   Hello, {currentUser}
                 </span>
-                <button
-                  onClick={onLogout}
-                  className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Logout
-                </button>
+                <Button onClick={onLogout} variant="secondary" size="sm">
+                  Sign out
+                </Button>
               </>
             )}
           </div>

@@ -11,32 +11,33 @@ function renderSequenceString(s) {
       const ev = st?.event ?? '';
       const to = st?.to ?? '';
       if (ev) {
-        parts.push(`-(${ev})-> ${to}`);
+        parts.push(` (${ev}) → ${to}`);
       } else {
-        parts.push(`-> ${to}`);
+        parts.push(` → ${to}`);
       }
     });
     return parts.join(' ');
   }
 
   // Fallback to simple state chain
-  return seq.join(' -> ');
+  return seq.join(' → ');
 }
 
 export default function StateSequenceList({ sequences = [] }) {
   if (!sequences || sequences.length === 0) return null;
 
   return (
-    <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
+    <section className="mt-12 bg-white shadow rounded-lg p-6">
       <h2 className="text-lg font-semibold mb-4">Sequences State Transitions Test Case</h2>
 
-      <table className="min-w-full table-auto">
-        <thead className="bg-gray-100">
+      <div className="relative -mx-6 px-6 overflow-x-auto">
+      <table className="min-w-full table-auto text-sm">
+        <thead className="bg-gray-50 sticky top-0 z-10">
           <tr>
             {['Test Case ID', 'Sequence (events)', 'Coverage (%)'].map((h, i) => (
               <th
                 key={h}
-                className={`py-2 px-4 text-sm font-medium text-gray-600 ${i === 1 ? 'text-left' : 'text-center'}`}
+                className={`py-2 px-4 text-sm font-medium text-ink-700 ${i === 1 ? 'text-left' : 'text-center'}`}
               >
                 {h}
               </th>
@@ -54,7 +55,7 @@ export default function StateSequenceList({ sequences = [] }) {
                 className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
               >
                 <td className="py-2 px-4 text-sm text-center">{s.seqCaseID}</td>
-                <td className="py-2 px-4 text-sm text-left font-mono whitespace-pre-wrap">
+                <td className="py-2 px-4 text-sm text-left whitespace-pre-wrap">
                   {renderSequenceString(s)}
                 </td>
                 <td className="py-2 px-4 text-sm text-center">{`${coverage.toFixed(2)}%`}</td>
@@ -63,6 +64,7 @@ export default function StateSequenceList({ sequences = [] }) {
           })}
         </tbody>
       </table>
+      </div>
     </section>
   );
 }

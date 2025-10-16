@@ -17,15 +17,17 @@ export default function TestCaseList({ testCases }) {
   const headers      = ['Test Case ID', 'Type', ...inputKeys, ...expectedKeys, 'Coverage (%)'];
 
   return (
-    <section className="mt-12 bg-white shadow rounded-lg p-6 overflow-x-auto">
+    <section className="mt-12 bg-white shadow rounded-lg p-6">
       <h2 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h2>
-      <table className="min-w-full table-auto">
-        <thead className="bg-gray-100">
+      {/* Responsive horizontal scroll with sticky header */}
+      <div className="relative -mx-6 px-6 overflow-x-auto">
+      <table className="min-w-full table-auto text-sm">
+        <thead className="bg-gray-50 sticky top-0 z-10">
           <tr>
             {headers.map(h => (
               <th
                 key={h}
-                className="py-2 px-4 text-sm font-medium text-gray-600 text-center"
+                className="py-2 px-4 text-sm font-medium text-ink-700 text-center"
               >
                 {h}
               </th>
@@ -68,6 +70,7 @@ export default function TestCaseList({ testCases }) {
           })}
         </tbody>
       </table>
+      </div>
     </section>
   );
 }

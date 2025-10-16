@@ -12,25 +12,24 @@ export default function PartitionView({ partitions }) {
 
         return (
           <section key={name} className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">{name}</h2>
+            <h2 className="text-lg font-semibold mb-4 text-ink-900">{name}</h2>
 
             {/* Bar */}
-            <div className="relative w-full h-8 bg-gray-200 flex rounded overflow-hidden mb-2">
+            <div className="relative w-full h-10 bg-ink-300 flex rounded overflow-hidden mb-2">
               {items.map((p, i) => (
                 <div
                   key={p.id}
-                  className={`flex-1 flex items-center justify-center ${
+                  className={`flex-1 flex items-center justify-center bg-primary-600 ${
                     i < items.length - 1 ? 'border-r border-white' : ''
                   }`}
-                  style={{ backgroundColor: '#38a169' }}
                 >
-                  <span className="text-xs font-bold text-red-400">{p.id}</span>
+                  <span className="text-sm font-semibold text-white">{p.id}</span>
                 </div>
               ))}
             </div>
 
             {/* Labels */}
-            <div className="flex text-sm text-gray-700">
+            <div className="flex text-sm text-ink-700">
               {items.map(p => (
                 <div key={p.id} className="flex-1 text-center truncate">
                   {p.label}

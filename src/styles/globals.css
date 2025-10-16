@@ -3,13 +3,38 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  font-size: 15px; /* Base 15px per audit */
 }
 
 @theme inline {
+  /* Map CSS vars to Tailwind tokens */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Brand palette (primary) */
+  --color-primary-900: #2C345F;
+  --color-primary-800: #3C467B;
+  --color-primary-700: #50589C;
+  --color-primary-600: #636CCB;
+  --color-primary-500: #6E8CFB;
+
+  /* Neutrals (ink) */
+  --color-ink-900: #0B102A;
+  --color-ink-700: #374151;
+  --color-ink-500: #6B7280;
+  --color-ink-300: #D1D5DB;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+
+  /* Shadows */
+  --shadow-1: 0 1px 2px rgba(0,0,0,.06);
+  --shadow-2: 0 6px 24px rgba(0,0,0,.08);
+
+  /* Sizing */
+  --max-w-content: 64rem; /* ≈ max-w-screen-lg */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +48,20 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Buttons (AA contrast on primary) */
+.btn { @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2; }
+.btn-primary { @apply bg-primary-700 text-white hover:bg-primary-800 disabled:opacity-50 disabled:pointer-events-none shadow-[var(--shadow-1)]; }
+.btn-secondary { @apply bg-white text-ink-900 border border-ink-300 hover:bg-gray-50 disabled:opacity-50 shadow-[var(--shadow-1)]; }
+.btn-ghost { @apply text-primary-700 hover:bg-gray-50; }
+
+/* Accessibility helpers */
+.sr-only-focusable:focus { position: absolute; left: 0.5rem; top: 0.5rem; @apply not-sr-only bg-white text-ink-900 px-3 py-2 rounded-md shadow-[var(--shadow-1)]; }
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .anim { transition: none !important; animation: none !important; }
 }
 
 /* ──────────────────────────────────────────────────

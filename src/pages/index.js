@@ -10,6 +10,7 @@ import XMLPreviewModal from '../components/XMLPreviewModal';
 import LoginModal from '../components/LoginModal';
 import RegisterModal from '../components/RegisterModal';
 import StateSequenceList from '../components/StateSequenceList';
+import Button from '../components/ui/button';
 const SequenceDiagram = dynamic(
   () => import('../components/SequenceDiagram'),
   {
@@ -18,9 +19,11 @@ const SequenceDiagram = dynamic(
   }
 );
 import { generateTestRun } from '../api/generate';
+import { useToast } from '../components/ui/ToastProvider';
 import { login, register } from '../api/auth';
 import { BASE } from '../api/runs';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
+import FileInput from '../components/ui/FileInput';
 
 const StateDiagram = dynamic(
   () => import('../components/StateDiagram'),
@@ -31,6 +34,7 @@ const StateDiagram = dynamic(
 );
 
 export default function Home() {
+  const toast = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState('');
   const [data, setData] = useState(null);
@@ -40,11 +44,11 @@ export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
+  const formRef = useRef(null);
+  const [pendingGenerate, setPendingGenerate] = useState(false);
 
 
-  const dataDictRef = useRef(null);
-  const decisionTreeRef = useRef(null);
-  const stateMachineRef = useRef(null);
+  // File refs managed internally by FileInput; form submission reads via FormData
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -66,18 +70,25 @@ export default function Home() {
       setIsLoggedIn(true);
       setCurrentUser(username);
       setLoginOpen(false);
+      if (pendingGenerate) {
+        setPendingGenerate(false);
+        toast.info('Signed in. Resuming generation…');
+        setTimeout(() => {
+          try { formRef.current?.requestSubmit?.(); } catch {}
+        }, 50);
+      }
     } else {
-      alert(error);
+      toast.error(error || 'Could not sign in. Please try again.');
     }
   };
 
   const handleRegister = async (username, email, password) => {
     const { success, error } = await register(username, email, password);
     if (success) {
-      alert('Registration successful! Please log in.');
+      toast.success('Account created. Please sign in.');
       setRegisterOpen(false);
     } else {
-      alert(error);
+      toast.error(error || 'Could not create account.');
     }
   };
 
@@ -88,27 +99,14 @@ export default function Home() {
     setCurrentUser('');
   };
 
-  const handleDictPreview = async () => {
-    const file = dataDictRef.current?.files?.[0];
-    if (!file) return;
-    openXmlModal('Data Dictionary Preview', await file.text());
-  };
-
-  const handleTreePreview = async () => {
-    const file = decisionTreeRef.current?.files?.[0];
-    if (!file) return;
-    openXmlModal('Decision Tree Preview', await file.text());
-  };
-
-  const handleStatePreview = async () => {
-    const file = stateMachineRef.current?.files?.[0];
-    if (!file) return;
-    openXmlModal('State Machine Preview', await file.text());
-  };
+  const previewDict = (text) => openXmlModal('Data Dictionary Preview', text);
+  const previewTree = (text) => openXmlModal('Decision Tree Preview', text);
+  const previewState = (text) => openXmlModal('State Machine Preview', text);
 
   const handleSubmit = async e => {
     e.preventDefault();
     if (!isLoggedIn) {
+      setPendingGenerate(true);
       setLoginOpen(true);
       return;
     }
@@ -153,10 +151,10 @@ export default function Home() {
           stateCsvUrl: stateUrl
         });
       } else {
-        alert(json.error || 'Generation failed');
+        toast.error("Couldn't generate tests. Check your XML files and try again.");
       }
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -164,6 +162,7 @@ export default function Home() {
 
   return (
     <>
+      <header role="banner">
       <Navbar
         isLoggedIn={isLoggedIn}
         currentUser={currentUser}
@@ -171,99 +170,84 @@ export default function Home() {
         onRegisterOpen={() => setRegisterOpen(true)}
         onLogout={handleLogout}
       />
+      </header>
 
-      <main className="container mx-auto p-6 space-y-8">
+      <main id="main" className="max-w-content mx-auto p-6 md:p-8 space-y-8">
+        {/* <h1 className="text-2xl font-bold text-ink-900">Generate Tests</h1> */}
         <form
+          ref={formRef}
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white shadow rounded-lg p-6"
         >
-          <div>
-            <label className="block mb-1 font-medium">Data Dictionary (XML)</label>
-            <input
-              ref={dataDictRef}
-              type="file"
-              name="dataDictionary"
-              accept=".xml"
-              required
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-600 hover:border-blue-400 focus:border-blue-500 cursor-pointer"
-            />
-            <button type="button" onClick={handleDictPreview} className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-              Preview XML
-            </button>
-          </div>
+          <FileInput
+            label="Data Dictionary (XML)"
+            name="dataDictionary"
+            accept=".xml"
+            required
+            hint="Upload the data dictionary XML file."
+            onPreview={previewDict}
+          />
 
-          <div>
-            <label className="block mb-1 font-medium">Decision Tree (XML)</label>
-            <input
-              ref={decisionTreeRef}
-              type="file"
-              name="decisionTree"
-              accept=".xml"
-              required
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-600 hover:border-blue-400 focus:border-blue-500 cursor-pointer"
-            />
-            <button type="button" onClick={handleTreePreview} className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-              Preview XML
-            </button>
-          </div>
+          <FileInput
+            label="Decision Tree (XML)"
+            name="decisionTree"
+            accept=".xml"
+            required
+            hint="Upload the decision tree XML file."
+            onPreview={previewTree}
+          />
 
-          <div>
-            <label className="block mb-1 font-medium">State Machine (XML)</label>
-            <input
-              ref={stateMachineRef}
-              type="file"
-              name="stateMachine"
-              accept=".xml"
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-600 hover:border-blue-400 focus:border-blue-500 cursor-pointer"
-            />
-            <button type="button" onClick={handleStatePreview} className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-              Preview XML
-            </button>
-          </div>
+          <FileInput
+            label="State Machine (XML)"
+            name="stateMachine"
+            accept=".xml"
+            hint="Optional: upload the state machine XML file."
+            onPreview={previewState}
+          />
 
           <div className="md:col-span-3 text-center">
-            <button type="submit" disabled={loading} className="w-full md:w-auto px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700">
-              {loading ? 'Generating...' : 'Generate & Save'}
-            </button>
+            <Button type="submit" loading={loading} className="w-full md:w-auto">
+              Generate Tests
+            </Button>
           </div>
         </form>
 
         {data && (
           <>
             <section className="bg-white shadow rounded-lg p-6 overflow-x-auto">
-              <h3 className="text-lg font-semibold mb-4">Equivalence Class Partitions</h3>
+              <h2 className="text-lg font-semibold mb-4">Equivalence Class Partitions</h2>
               <PartitionView partitions={data.partitions} />
             </section>
 
             <section className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h3>
+              <h2 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h2>
               <TestCaseList testCases={data.testCases} />
               <div className="mt-4 text-center">
-                <a href={data.ecpCsvUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                <Button as="a" href={data.ecpCsvUrl} target="_blank" rel="noopener noreferrer">
                   Download ECP CSV
-                </a>
+                </Button>
               </div>
             </section>
 
             <section className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Syntax Test Cases</h3>
+              <h2 className="text-lg font-semibold mb-4">Syntax Test Cases</h2>
               <SyntaxTestList syntaxResults={data.syntaxResults} />
               <div className="mt-4 text-center">
-                <a href={data.syntaxCsvUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">
+                <Button as="a" href={data.syntaxCsvUrl} target="_blank" rel="noopener noreferrer">
                   Download Syntax CSV
-                </a>
+                </Button>
               </div>
             </section>
 
             {(data.stateTreeNodes?.length > 0 || data.seqNodes?.length > 0 || data.nodes?.length > 0) && (
               <section className="bg-white shadow rounded-lg p-6 mt-8">
-                <h3 className="text-lg font-semibold mb-4">
+                <h2 className="text-lg font-semibold mb-4">
                   {data.stateTreeNodes?.length > 0
                     ? 'State Tree Diagram'
                     : data.seqNodes?.length > 0
                       ? 'State Sequence Tree'
                       : 'State Transition Diagram'}
-                </h3>
+                </h2>
                 {data.stateTreeNodes?.length > 0 ? (
                   <SequenceDiagram nodes={data.stateTreeNodes} links={data.stateTreeLinks} />
                 ) : data.seqNodes?.length > 0 ? (
@@ -276,14 +260,14 @@ export default function Home() {
 
             {(data.stateValid?.length > 0 || data.stateInvalid?.length > 0) && (
               <section className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4">State Transition Test Cases</h3>
+                <h2 className="text-lg font-semibold mb-4">State Transition Test Cases</h2>
                 <StateTestList validTests={data.stateValid} invalidTests={data.stateInvalid} />
                 {/* <h3 className="text-lg font-semibold mb-4">State Sequences</h3> */}
                 <StateSequenceList sequences={data.stateSequences} />
                 <div className="mt-4 text-center">
-                  <a href={data.stateCsvUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                  <Button as="a" href={data.stateCsvUrl} target="_blank" rel="noopener noreferrer">
                     Download State CSV
-                  </a>
+                  </Button>
                 </div>
               </section>
             )}
@@ -308,9 +292,9 @@ export default function Home() {
 
 
             <div className="text-center mt-6">
-              <a href={data.csvUrl} target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+              <Button as="a" href={data.csvUrl} target="_blank" rel="noopener noreferrer">
                 Download Combined CSV
-              </a>
+              </Button>
             </div>
           </>
         )}
@@ -352,6 +336,7 @@ export default function Home() {
           onClose={() => setForgotOpen(false)}
         />
       </main>
+      <footer role="contentinfo" className="max-w-content mx-auto p-6 md:p-8"></footer>
     </>
   );
 }

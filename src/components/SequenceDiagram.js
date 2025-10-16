@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as go from 'gojs';
 import { downloadPNG as savePNG, downloadSVG as saveSVG } from '../lib/diagramExport';
+import Button from './ui/button';
 
 export default function SequenceDiagram({ nodes = [], links = [] }) {
   const diagramRef = useRef(null);
@@ -64,12 +65,8 @@ export default function SequenceDiagram({ nodes = [], links = [] }) {
     <div>
       <div ref={diagramRef} style={{ width: '100%', height: '600px', border: '1px solid #ddd' }} />
       <div className="mt-4 text-center space-x-4">
-        <button onClick={downloadPNG} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Download PNG
-        </button>
-        <button onClick={downloadSVG} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Download SVG
-        </button>
+        <Button onClick={downloadPNG}>Download PNG</Button>
+        <Button onClick={downloadSVG} variant="secondary">Download SVG</Button>
       </div>
     </div>
   );

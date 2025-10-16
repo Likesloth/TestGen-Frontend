@@ -1,6 +1,7 @@
 ﻿// src/components/LoginModal.js
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, X } from 'lucide-react';
+import Button from './ui/button';
 
 export default function LoginModal({
   isOpen,
@@ -62,8 +63,8 @@ export default function LoginModal({
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
-            <p className="text-gray-600 mt-1">Sign in to BlackBoxTestGen</p>
+            <h2 className="text-2xl font-bold text-ink-900">Welcome Back</h2>
+            <p className="text-ink-700 mt-1">Sign in to BlackBoxTestGen</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
             <X className="w-5 h-5 text-gray-500" />
@@ -79,7 +80,7 @@ export default function LoginModal({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Username */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-ink-900 mb-1">
               Username
             </label>
             <div className="relative">
@@ -93,8 +94,8 @@ export default function LoginModal({
                 }}
                 className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 ${
                   errors.username
-                    ? 'border-red-300 focus:ring-red-500/20'
-                    : 'border-gray-300 focus:ring-blue-500/20'
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-ink-300 focus:ring-primary-600'
                 }`}
                 placeholder="Your username"
                 disabled={isLoading}
@@ -108,7 +109,7 @@ export default function LoginModal({
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-ink-900 mb-1">
               Password
             </label>
             <div className="relative">
@@ -122,8 +123,8 @@ export default function LoginModal({
                 }}
                 className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 ${
                   errors.password
-                    ? 'border-red-300 focus:ring-red-500/20'
-                    : 'border-gray-300 focus:ring-blue-500/20'
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-ink-300 focus:ring-primary-600'
                 }`}
                 placeholder="Your password"
                 disabled={isLoading}
@@ -145,21 +146,8 @@ export default function LoginModal({
 
           {/* Actions */}
           <div className="flex flex-col space-y-3 pt-2">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50"
-            >
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isLoading}
-              className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 disabled:opacity-50"
-            >
-              Cancel
-            </button>
+            <Button type="submit" loading={isLoading} className="w-full">Sign in</Button>
+            <Button type="button" onClick={onClose} disabled={isLoading} variant="secondary" className="w-full">Cancel</Button>
           </div>
         </form>
 
@@ -172,7 +160,7 @@ export default function LoginModal({
                 onClose();
                 onOpenRegister?.();
               }}
-              className="text-blue-600 hover:text-blue-700 font-semibold"
+              className="text-primary-700 hover:text-primary-800 font-semibold"
             >
               Sign up
             </button>
@@ -183,7 +171,7 @@ export default function LoginModal({
               onClose();
               onForgot?.();
             }}
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-primary-700 hover:underline"
           >
             Forgot password?
           </button>

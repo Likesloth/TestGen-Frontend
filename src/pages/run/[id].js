@@ -19,6 +19,7 @@ const SequenceDiagram = dynamic(
 )
 
 import Link from 'next/link'
+import Button from '../../components/ui/button'
 import {
   getRun,
   downloadEcpCsv,
@@ -117,6 +118,7 @@ export default function RunDetail() {
 
   return (
     <>
+      <header role="banner">
       <Navbar
         isLoggedIn={auth.isLoggedIn}
         currentUser={auth.user}
@@ -124,62 +126,54 @@ export default function RunDetail() {
         onRegisterOpen={() => { }}
         onLogout={handleLogout}
       />
+      </header>
 
-      <main className="container mx-auto p-6 space-y-6">
+      <main id="main" className="max-w-content mx-auto p-6 md:p-8 space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold">Run Details</h2>
-          <Link
-            href="/history"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Back to History
+          <h1 className="text-2xl font-bold text-ink-900">Run Details</h1>
+          <Link href="/history">
+            <Button variant="secondary" as="span">Back to History</Button>
           </Link>
         </div>
 
         {/* Partitions */}
         <section className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Partitions</h3>
+          <h2 className="text-lg font-semibold mb-4">Partitions</h2>
           <PartitionView partitions={partitions} />
         </section>
 
         {/* ECP Test Cases */}
         <section className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h3>
+          <h2 className="text-lg font-semibold mb-4">Equivalence Class Partitioning Test Cases</h2>
           <TestCaseList testCases={testCases} />
           <div className="mt-4 text-center">
-            <a
-              href={ecpCsvUrl}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            >
+            <Button as="a" href={ecpCsvUrl}>
               Download ECP CSV
-            </a>
+            </Button>
           </div>
         </section>
 
         {/* Syntax Test Cases */}
         <section className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Syntax Test Cases</h3>
+          <h2 className="text-lg font-semibold mb-4">Syntax Test Cases</h2>
           <SyntaxTestList syntaxResults={syntaxResults} />
           <div className="mt-4 text-center">
-            <a
-              href={synCsvUrl}
-              className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
-            >
+            <Button as="a" href={synCsvUrl}>
               Download Syntax CSV
-            </a>
+            </Button>
           </div>
         </section>
 
         {/* State diagram area: prefer new state tree, then seq tree, else model */}
         {(treeNodes?.length > 0 || seqNodes?.length > 0 || nodes?.length > 0) && (
           <section className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">
+            <h2 className="text-lg font-semibold mb-4">
               {treeNodes?.length > 0
                 ? 'State Tree Diagram'
                 : seqNodes?.length > 0
                   ? 'State Sequence Tree'
                   : 'State Transition Diagram'}
-            </h3>
+            </h2>
             {treeNodes?.length > 0 ? (
               <SequenceDiagram nodes={treeNodes} links={treeLinks} />
             ) : seqNodes?.length > 0 ? (
@@ -194,20 +188,17 @@ export default function RunDetail() {
         {/* State Transition Tests */}
         {(stateValid.length > 0 || stateInvalid.length > 0) && (
           <section className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">
+            <h2 className="text-lg font-semibold mb-4">
               State Transition Test Cases
-            </h3>
+            </h2>
             <StateTestList
               validTests={stateValid}
               invalidTests={stateInvalid}
             />
             <div className="mt-4 text-center">
-              <a
-                href={stateCsvUrl}
-                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-              >
+              <Button as="a" href={stateCsvUrl}>
                 Download State CSV
-              </a>
+              </Button>
             </div>
           </section>
         )}
@@ -215,21 +206,19 @@ export default function RunDetail() {
         {/* State Sequences */}
         {stateSequences.length > 0 && (
           <section className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">Sequences State Transitions Test Cases</h3>
+            <h2 className="text-lg font-semibold mb-4">Sequences State Transitions Test Cases</h2>
             <StateSequenceList sequences={stateSequences} />
           </section>
         )}
 
         {/* Combined Excel */}
         <div className="text-center">
-          <a
-            href={excelUrl}
-            className="inline-block mt-4 px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700"
-          >
+          <Button as="a" href={excelUrl} className="mt-4">
             Download Combined Excel
-          </a>
+          </Button>
         </div>
       </main>
+      <footer role="contentinfo" className="max-w-content mx-auto p-6 md:p-8"></footer>
     </>
   )
 }

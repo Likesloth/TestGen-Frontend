@@ -1,6 +1,7 @@
 ﻿// src/components/RegisterModal.js
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, X, Mail } from 'lucide-react';
+import Button from './ui/button';
 
 export default function RegisterModal({
   isOpen,
@@ -86,8 +87,8 @@ export default function RegisterModal({
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-bold">Create Account</h2>
-            <p className="text-gray-600 mt-1">Sign up for BlackBoxTestGen</p>
+            <h2 className="text-2xl font-bold text-ink-900">Create Account</h2>
+            <p className="text-ink-700 mt-1">Sign up for BlackBoxTestGen</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
             <X className="w-5 h-5 text-gray-500" />
@@ -105,7 +106,7 @@ export default function RegisterModal({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Username */}
           <div>
-            <label className="block text-sm font-semibold mb-1">Username</label>
+            <label className="block text-sm font-semibold text-ink-900 mb-1">Username</label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -117,8 +118,8 @@ export default function RegisterModal({
                 }}
                 className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 ${
                   errors.username
-                    ? 'border-red-300 focus:ring-red-500/20'
-                    : 'border-gray-300 focus:ring-green-500/20'
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-ink-300 focus:ring-primary-600'
                 }`}
                 placeholder="Choose a username"
                 disabled={isLoading}
@@ -132,7 +133,7 @@ export default function RegisterModal({
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-semibold mb-1">Email</label>
+            <label className="block text-sm font-semibold text-ink-900 mb-1">Email</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -144,8 +145,8 @@ export default function RegisterModal({
                 }}
                 className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 ${
                   errors.email
-                    ? 'border-red-300 focus:ring-red-500/20'
-                    : 'border-gray-300 focus:ring-green-500/20'
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-ink-300 focus:ring-primary-600'
                 }`}
                 placeholder="you@example.com"
                 disabled={isLoading}
@@ -159,7 +160,7 @@ export default function RegisterModal({
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-semibold mb-1">Password</label>
+            <label className="block text-sm font-semibold text-ink-900 mb-1">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -171,10 +172,10 @@ export default function RegisterModal({
                 }}
                 className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:outline-none focus:ring-2 ${
                   errors.password
-                    ? 'border-red-300 focus:ring-red-500/20'
-                    : 'border-gray-300 focus:ring-green-500/20'
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-ink-300 focus:ring-primary-600'
                 }`}
-                placeholder="Your password"
+                placeholder="Create a strong password"
                 disabled={isLoading}
                 required
               />
@@ -194,21 +195,8 @@ export default function RegisterModal({
 
           {/* Buttons */}
           <div className="flex flex-col space-y-3 pt-2">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-3 rounded-xl hover:from-green-700 hover:to-green-800 disabled:opacity-50"
-            >
-              {isLoading ? 'Creating...' : 'Create Account'}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isLoading}
-              className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 disabled:opacity-50"
-            >
-              Cancel
-            </button>
+            <Button type="submit" loading={isLoading} className="w-full">Create account</Button>
+            <Button type="button" onClick={onClose} disabled={isLoading} variant="secondary" className="w-full">Cancel</Button>
           </div>
         </form>
 
@@ -221,7 +209,7 @@ export default function RegisterModal({
                 onClose();
                 onOpenLogin?.();
               }}
-              className="text-green-600 hover:text-green-700 font-semibold"
+              className="text-primary-700 hover:text-primary-800 font-semibold"
             >
               Sign in
             </button>

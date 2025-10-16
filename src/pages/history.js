@@ -4,8 +4,10 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import Link   from 'next/link';
 import { listRuns } from '../api/runs';
+import { useToast } from '../components/ui/ToastProvider';
 
 export default function HistoryPage() {
+  const toast = useToast();
   const router = useRouter();
 
   const [runs, setRuns]               = useState([]);
@@ -25,7 +27,7 @@ export default function HistoryPage() {
         .then(data => setRuns(data))
         .catch(err => {
           console.error(err);
-          alert(err.message || 'Could not load history');
+          toast.error("Couldn't load history. Please try again.");
         })
         .finally(() => setLoading(false));
     } else {
@@ -48,6 +50,7 @@ export default function HistoryPage() {
 
   return (
     <>
+      <header role="banner">
       <Navbar
         isLoggedIn={isLoggedIn}
         currentUser={currentUser}
@@ -55,48 +58,52 @@ export default function HistoryPage() {
         onRegisterOpen={() => {}}
         onLogout={handleLogout}
       />
+      </header>
 
-      <main className="container mx-auto p-6 space-y-6">
-        <h2 className="text-2xl font-semibold">TestGen History</h2>
+      <main id="main" className="max-w-content mx-auto p-6 md:p-8 space-y-6">
+        <h1 className="text-2xl font-bold text-ink-900">TestGen History</h1>
 
         {runs.length === 0 ? (
-          <p>No runs yet.</p>
+          <p className="text-ink-700">No test runs yet. Upload XMLs on Home to get started.</p>
         ) : (
-          <table className="min-w-full bg-white shadow rounded-lg overflow-hidden">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-left">Date</th>
-                <th className="px-4 py-2 text-left">Data Dictionary</th>
-                <th className="px-4 py-2 text-left">Decision Tree</th>
-                <th className="px-4 py-2 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {runs.map(run => (
-                <tr key={run._id} className="border-t">
-                  <td className="px-4 py-2 text-sm">
-                    {new Date(run.createdAt).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2 text-sm">
-                    {run.dataDictionaryFilename}
-                  </td>
-                  <td className="px-4 py-2 text-sm">
-                    {run.decisionTreeFilename}
-                  </td>
-                  <td className="px-4 py-2 text-sm">
-                    <Link
-                      href={`/run/${run._id}`}
-                      className="text-indigo-600 hover:underline"
-                    >
-                      View
-                    </Link>
-                  </td>
+          <div className="relative -mx-6 px-6 overflow-x-auto">
+            <table className="min-w-full table-auto text-sm bg-white shadow rounded-lg">
+              <thead className="bg-gray-50 sticky top-0 z-10">
+                <tr>
+                  <th className="px-4 py-2 text-left font-medium text-ink-700">Date</th>
+                  <th className="px-4 py-2 text-left font-medium text-ink-700">Data Dictionary</th>
+                  <th className="px-4 py-2 text-left font-medium text-ink-700">Decision Tree</th>
+                  <th className="px-4 py-2 text-left font-medium text-ink-700">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {runs.map(run => (
+                  <tr key={run._id} className="border-t">
+                    <td className="px-4 py-2">
+                      {new Date(run.createdAt).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2">
+                      {run.dataDictionaryFilename}
+                    </td>
+                    <td className="px-4 py-2">
+                      {run.decisionTreeFilename}
+                    </td>
+                    <td className="px-4 py-2">
+                      <Link
+                        href={`/run/${run._id}`}
+                        className="text-primary-700 hover:underline"
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </main>
+      <footer role="contentinfo" className="max-w-content mx-auto p-6 md:p-8"></footer>
     </>
   );
 }
