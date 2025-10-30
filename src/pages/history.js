@@ -64,7 +64,7 @@ export default function HistoryPage() {
         <h1 className="text-2xl font-bold text-ink-900">TestGen History</h1>
 
         {runs.length === 0 ? (
-          <p className="text-ink-700">No test runs yet. Upload XMLs on Home to get started.</p>
+          <p className="text-ink-700">No test runs yet. Upload your Data Dictionary XML on Home to get started.</p>
         ) : (
           <div className="relative -mx-6 px-6 overflow-x-auto">
             <table className="min-w-full table-auto text-sm bg-white shadow rounded-lg">

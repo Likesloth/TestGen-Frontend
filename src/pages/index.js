@@ -180,11 +180,11 @@ export default function Home() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white shadow rounded-lg p-6"
         >
           <FileInput
-            label="Data Dictionary (XML)"
+            label="Use Case Data Dictionary (XML)"
             name="dataDictionary"
             accept=".xml"
             required
-            hint="Upload the data dictionary XML file."
+            hint="Upload the Use Case Data Dictionary XML. You can submit just this file."
             onPreview={previewDict}
           />
 
@@ -192,8 +192,7 @@ export default function Home() {
             label="Decision Tree (XML)"
             name="decisionTree"
             accept=".xml"
-            required
-            hint="Upload the decision tree XML file."
+            hint="Optional: upload the decision tree XML file."
             onPreview={previewTree}
           />
 
