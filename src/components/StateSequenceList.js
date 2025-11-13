@@ -31,13 +31,13 @@ export default function StateSequenceList({ sequences = [] }) {
       <h2 className="text-lg font-semibold mb-4">Sequences State Transitions Test Case</h2>
 
       <div className="relative -mx-6 px-6 overflow-x-auto">
-      <table className="min-w-full table-auto text-sm">
+      <table className="min-w-full table-auto text-base">
         <thead className="bg-gray-50 sticky top-0 z-10">
           <tr>
             {['Test Case ID', 'Sequence (events)', 'Coverage (%)'].map((h, i) => (
               <th
                 key={h}
-                className={`py-2 px-4 text-sm font-medium text-ink-700 ${i === 1 ? 'text-left' : 'text-center'}`}
+                className={`py-2 px-4 text-base font-medium text-ink-700 ${i === 1 ? 'text-left' : 'text-center'}`}
               >
                 {h}
               </th>
@@ -54,11 +54,11 @@ export default function StateSequenceList({ sequences = [] }) {
                 key={s.seqCaseID || idx}
                 className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
               >
-                <td className="py-2 px-4 text-sm text-center">{s.seqCaseID}</td>
-                <td className="py-2 px-4 text-sm text-left whitespace-pre-wrap">
+                <td className="py-2 px-4 text-base text-center">{s.seqCaseID}</td>
+                <td className="py-2 px-4 text-base text-left whitespace-pre-wrap">
                   {renderSequenceString(s)}
                 </td>
-                <td className="py-2 px-4 text-sm text-center">{`${coverage.toFixed(2)}%`}</td>
+                <td className="py-2 px-4 text-base text-center">{`${coverage.toFixed(2)}%`}</td>
               </tr>
             );
           })}

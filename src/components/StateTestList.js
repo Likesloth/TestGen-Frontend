@@ -10,13 +10,13 @@ export default function StateTestList({ validTests = [], invalidTests = [] }) {
       <section className="mt-12 bg-white shadow rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Valid Single State Transitions Test Cases</h2>
         <div className="relative -mx-6 px-6 overflow-x-auto">
-        <table className="min-w-full table-auto text-sm">
+        <table className="min-w-full table-auto text-base">
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
               {['Test Case ID', 'Type', 'Start State', 'Transition (Start → Expected)', 'Expected State', 'Coverage (%)'].map(h => (
                 <th
                   key={h}
-                  className="py-2 px-4 text-sm font-medium text-ink-700 text-center"
+                  className="py-2 px-4 text-base font-medium text-ink-700 text-center"
                 >
                   {h}
                 </th>
@@ -35,12 +35,12 @@ export default function StateTestList({ validTests = [], invalidTests = [] }) {
                   key={t.testCaseID}
                   className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                 >
-                  <td className="py-2 px-4 text-sm text-center">{t.testCaseID}</td>
-                  <td className="py-2 px-4 text-sm text-center">{t.type}</td>
-                  <td className="py-2 px-4 text-sm text-center">{t.startState}</td>
-                  <td className="py-2 px-4 text-sm text-center">{desc}</td>
+                  <td className="py-2 px-4 text-base text-center">{t.testCaseID}</td>
+                  <td className="py-2 px-4 text-base text-center">{t.type}</td>
+                  <td className="py-2 px-4 text-base text-center">{t.startState}</td>
+                  <td className="py-2 px-4 text-base text-center">{desc}</td>
                   <td className="py-2 px-4 text-sm text-center">{t.expectedState ?? '—'}</td>
-                  <td className="py-2 px-4 text-sm text-center">{`${coverage.toFixed(2)}%`}</td>
+                  <td className="py-2 px-4 text-base text-center">{`${coverage.toFixed(2)}%`}</td>
                 </tr>
               )
             })}
@@ -53,13 +53,13 @@ export default function StateTestList({ validTests = [], invalidTests = [] }) {
       <section className="mt-12 bg-white shadow rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">Invalid Single State Transitions Test Cases</h2>
         <div className="relative -mx-6 px-6 overflow-x-auto">
-        <table className="min-w-full table-auto text-sm">
+        <table className="min-w-full table-auto text-base">
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
               {['Test Case ID', 'Type', 'Start State', 'Transition (Start → Expected)', 'Expected State', 'Coverage (%)'].map(h => (
                 <th
                   key={h}
-                  className="py-2 px-4 text-sm font-medium text-ink-700 text-center"
+                  className="py-2 px-4 text-base font-medium text-ink-700 text-center"
                 >
                   {h}
                 </th>
@@ -79,12 +79,12 @@ export default function StateTestList({ validTests = [], invalidTests = [] }) {
                   key={t.testCaseID}
                   className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                 >
-                  <td className="py-2 px-4 text-sm text-center">{t.testCaseID}</td>
-                  <td className="py-2 px-4 text-sm text-center">{t.type}</td>
-                  <td className="py-2 px-4 text-sm text-center">{t.startState}</td>
-                  <td className="py-2 px-4 text-sm text-center">{desc}</td>
+                  <td className="py-2 px-4 text-base text-center">{t.testCaseID}</td>
+                  <td className="py-2 px-4 text-base text-center">{t.type}</td>
+                  <td className="py-2 px-4 text-base text-center">{t.startState}</td>
+                  <td className="py-2 px-4 text-base text-center">{desc}</td>
                   <td className="py-2 px-4 text-sm text-center">{t.expectedState ?? '—'}</td>
-                  <td className="py-2 px-4 text-sm text-center">{`${coverage.toFixed(2)}%`}</td>
+                  <td className="py-2 px-4 text-base text-center">{`${coverage.toFixed(2)}%`}</td>
                 </tr>
               )
             })}
