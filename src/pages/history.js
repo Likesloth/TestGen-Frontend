@@ -61,7 +61,7 @@ export default function HistoryPage() {
       </header>
 
       <main id="main" className="max-w-content mx-auto p-6 md:p-8 space-y-6">
-        <h1 className="text-2xl font-bold text-ink-900">TestGen History</h1>
+        <h1 className="text-2xl font-bold text-ink-900">History</h1>
 
         {runs.length === 0 ? (
           <p className="text-ink-700">No test runs yet. Upload your Data Dictionary XML on Home to get started.</p>
@@ -73,6 +73,7 @@ export default function HistoryPage() {
                   <th className="px-4 py-2 text-left font-medium text-ink-700">Date</th>
                   <th className="px-4 py-2 text-left font-medium text-ink-700">Data Dictionary</th>
                   <th className="px-4 py-2 text-left font-medium text-ink-700">Decision Tree</th>
+                  <th className="px-4 py-2 text-left font-medium text-ink-700">State Machine</th>
                   <th className="px-4 py-2 text-left font-medium text-ink-700">Actions</th>
                 </tr>
               </thead>
@@ -87,6 +88,41 @@ export default function HistoryPage() {
                     </td>
                     <td className="px-4 py-2">
                       {run.decisionTreeFilename}
+                    </td>
+                    <td className="px-4 py-2">
+                      {(() => {
+                        const toBase = (f) => typeof f === 'string' ? f.split(/[\\\\/]/).pop() : '';
+                        const flat = (val) => Array.isArray(val) ? val : (val ? [val] : []);
+
+                        // Prefer array-style fields from backend
+                        const arrayCandidates = [
+                          ...flat(run?.stateMachineFilenames),
+                          ...flat(run?.stateMachineFiles),
+                          ...flat(run?.stateMachinePaths)
+                        ]
+                          .map(toBase)
+                          .filter(Boolean);
+
+                        let list = arrayCandidates;
+                        if (list.length === 0) {
+                          // Fallback to single-value fields
+                          list = [
+                            run?.stateMachineFilename,
+                            run?.stateMachineOriginalName,
+                            run?.stateMachineOriginalFilename,
+                            run?.stateMachineFilename2,
+                            run?.stateSequenceFilename,
+                            run?.stateMachineFile,
+                            run?.stateMachine
+                          ]
+                            .map(toBase)
+                            .filter(Boolean);
+                        }
+
+                        // Deduplicate identical names
+                        const unique = [...new Set(list)];
+                        return unique.length ? unique.join(', ') : '—';
+                      })()}
                     </td>
                     <td className="px-4 py-2">
                       <Link
